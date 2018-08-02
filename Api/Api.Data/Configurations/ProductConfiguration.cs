@@ -1,0 +1,20 @@
+﻿namespace Api.Data.Configurations
+{
+    using Api.Domain.Entities;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+    public class ProductConfiguration : IEntityTypeConfiguration<Product>
+    {
+        public void Configure(EntityTypeBuilder<Product> builder)
+        {
+            builder.HasAlternateKey(p => p.Number);
+
+            builder.HasMany(p => p.Images).WithOne(i => i.Product).HasForeignKey(i => i.ProductId);
+
+            builder.HasMany(p => p.ProductOrders).WithOne(po => po.Product).HasForeignKey(po => po.ProductId);
+
+            builder.HasMany(p => p.CategoryProducts).WithOne(cp => cp.Product).HasForeignKey(cp => cp.ProductId);
+        }
+    }
+}
