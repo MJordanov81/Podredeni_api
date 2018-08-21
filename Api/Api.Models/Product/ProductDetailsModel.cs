@@ -2,7 +2,9 @@
 {
     using Api.Common.Mapping;
     using Api.Domain.Entities;
+    using Api.Models.PromoDiscount;
     using AutoMapper;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -25,6 +27,8 @@
         public bool IsTopSeller { get; set; }
 
         public ICollection<string> Images { get; set; }
+
+        public decimal Discount { get; set; }
 
         public void ConfigureMapping(Profile mapper)
         {

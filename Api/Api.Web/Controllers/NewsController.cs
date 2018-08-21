@@ -31,9 +31,9 @@
                 return this.StatusCode(StatusCodes.Status401Unauthorized);
             }
 
-            if (!ModelState.IsValid)
+            if (!this.ModelState.IsValid)
             {
-                return this.BadRequest(ModelState);
+                return this.BadRequest(this.ModelState);
             }
 
             try

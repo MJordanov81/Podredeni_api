@@ -42,6 +42,10 @@
 
         public DbSet<CarouselItem> CarouselItems { get; set; }
 
+        public DbSet<PromoDiscount> PromoDiscounts { get; set; }
+
+        public DbSet<ProductPromoDiscount> ProductPromoDiscounts { get; set; }
+
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -57,6 +61,10 @@
             builder.ApplyConfiguration(new CategoryConfiguration());
 
             builder.ApplyConfiguration(new CategoryProductConfiguration());
+
+            builder.ApplyConfiguration(new PromoDiscountConfiguration());
+
+            builder.ApplyConfiguration(new ProductPromoDiscountConfiguration());
 
             base.OnModelCreating(builder);
         }

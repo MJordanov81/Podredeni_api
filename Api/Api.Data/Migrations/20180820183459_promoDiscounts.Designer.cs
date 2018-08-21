@@ -12,9 +12,10 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180820183459_promoDiscounts")]
+    partial class promoDiscounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,19 +381,6 @@ namespace Api.Data.Migrations
                     b.ToTable("ProductOrders");
                 });
 
-            modelBuilder.Entity("Api.Domain.Entities.ProductPromoDiscount", b =>
-                {
-                    b.Property<string>("ProductId");
-
-                    b.Property<string>("PromoDiscountId");
-
-                    b.HasKey("ProductId", "PromoDiscountId");
-
-                    b.HasIndex("PromoDiscountId");
-
-                    b.ToTable("ProductPromoDiscounts");
-                });
-
             modelBuilder.Entity("Api.Domain.Entities.PromoDiscount", b =>
                 {
                     b.Property<string>("Id")
@@ -402,11 +390,13 @@ namespace Api.Data.Migrations
 
                     b.Property<DateTime>("EndDate");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("ProductId");
 
                     b.Property<DateTime>("StartDate");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("PromoDiscounts");
                 });
@@ -533,17 +523,11 @@ namespace Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Api.Domain.Entities.ProductPromoDiscount", b =>
+            modelBuilder.Entity("Api.Domain.Entities.PromoDiscount", b =>
                 {
-                    b.HasOne("Api.Domain.Entities.Product", "Product")
-                        .WithMany("ProductPromoDiscounts")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Api.Domain.Entities.PromoDiscount", "PromoDiscount")
-                        .WithMany("ProductPromoDiscounts")
-                        .HasForeignKey("PromoDiscountId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("Api.Domain.Entities.Product")
+                        .WithMany("PromoDiscounts")
+                        .HasForeignKey("ProductId");
                 });
 
             modelBuilder.Entity("Api.Domain.Entities.User", b =>

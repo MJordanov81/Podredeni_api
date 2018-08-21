@@ -12,9 +12,10 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180820192029_promoDiscountUpdate")]
+    partial class promoDiscountUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -401,8 +402,6 @@ namespace Api.Data.Migrations
                     b.Property<decimal>("Discount");
 
                     b.Property<DateTime>("EndDate");
-
-                    b.Property<string>("Name");
 
                     b.Property<DateTime>("StartDate");
 

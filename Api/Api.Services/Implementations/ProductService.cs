@@ -7,6 +7,7 @@
     using AutoMapper.QueryableExtensions;
     using Infrastructure.Constants;
     using Interfaces;
+    using Microsoft.EntityFrameworkCore;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -101,9 +102,24 @@
         //Get details for a range of products - filtered, sorted and paginated
         public async Task<ProductDetailsListPaginatedModel> GetAll(PaginationModel pagination, bool includeBlocked)
         {
+ 
             IEnumerable<ProductDetailsModel> products = db.Products
                 .ProjectTo<ProductDetailsModel>()
                 .ToList();
+
+            DateTime today = DateTime.Now.Date;
+
+            foreach (ProductDetailsModel product in products)
+            {
+                if(db.ProductPromoDiscounts.Any(d => d.ProductId == product.Id))
+                {
+                    product.Discount = db.ProductPromoDiscounts
+                        .Where(d => d.ProductId == product.Id)
+                        .Select(d => d.PromoDiscount)
+                        .Where(d => d.StartDate <= today && d.EndDate >= today)
+                        .Sum(d => d.Discount);
+                }           
+            }
 
             if (!string.IsNullOrEmpty(pagination.FilterElement))
             {

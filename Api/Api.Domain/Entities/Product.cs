@@ -34,5 +34,7 @@
         public ICollection<ProductOrder> ProductOrders { get; set; } = new List<ProductOrder>();
 
         public ICollection<CategoryProduct> CategoryProducts { get; set; } = new List<CategoryProduct>();
+
+        public ICollection<ProductPromoDiscount> ProductPromoDiscounts { get; set; } = new List<ProductPromoDiscount>();
     }
 }

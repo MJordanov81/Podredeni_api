@@ -15,6 +15,8 @@
             builder.HasMany(p => p.ProductOrders).WithOne(po => po.Product).HasForeignKey(po => po.ProductId);
 
             builder.HasMany(p => p.CategoryProducts).WithOne(cp => cp.Product).HasForeignKey(cp => cp.ProductId);
+
+            builder.HasMany(p => p.ProductPromoDiscounts).WithOne(d => d.Product).HasForeignKey(d => d.ProductId);
         }
     }
 }
