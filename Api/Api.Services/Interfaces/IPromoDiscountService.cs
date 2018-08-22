@@ -10,6 +10,12 @@
 
         Task<ICollection<PromoDiscountDetailsModel>> GetList();
 
-        Task Assign(string promoDiscountId, string productId);
+        Task<PromoDiscountDetailsModel> Get(string promoId);
+
+        Task Assign(string promoId, string productId);
+
+        Task Edit(string promoId, PromoDiscountCreateModel data);
+
+        Task Delete(string promoId);
     }
 }

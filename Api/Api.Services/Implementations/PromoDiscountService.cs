@@ -8,6 +8,7 @@
     using Microsoft.EntityFrameworkCore;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
     public class PromoDiscountService : IPromoDiscountService
@@ -19,14 +20,14 @@
             this.db = db;
         }
 
-        public async Task Assign(string promoDiscountId, string productId)
+        public async Task Assign(string promoId, string productId)
         {
-            if (!await this.db.PromoDiscounts.AnyAsync(d => d.Id == promoDiscountId) || !await this.db.Products.AnyAsync(p => p.Id == productId))
+            if (!await this.db.PromoDiscounts.AnyAsync(d => d.Id == promoId) || !await this.db.Products.AnyAsync(p => p.Id == productId))
             {
                 throw new ArgumentException("Either promo or product not found in DB");
             }
 
-            ProductPromoDiscount existingProductPromoDiscount = await this.db.ProductPromoDiscounts.FirstOrDefaultAsync(d => d.PromoDiscountId == promoDiscountId && d.ProductId == productId);
+            ProductPromoDiscount existingProductPromoDiscount = await this.db.ProductPromoDiscounts.FirstOrDefaultAsync(d => d.PromoDiscountId == promoId && d.ProductId == productId);
 
             if (existingProductPromoDiscount != null)
             {
@@ -39,7 +40,7 @@
 
             ProductPromoDiscount productPromoDiscount = new ProductPromoDiscount
             {
-                PromoDiscountId = promoDiscountId,
+                PromoDiscountId = promoId,
                 ProductId = productId
             };
 
@@ -66,6 +67,51 @@
             await this.db.SaveChangesAsync();
 
             return discount.Id;
+        }
+
+        public async Task Delete(string promoId)
+        {
+            if (!await this.db.PromoDiscounts.AnyAsync(p => p.Id == promoId)) throw new ArgumentException("Cannot find promo in DB");
+
+            IList<ProductPromoDiscount> productPromoDiscounts = await this.db.ProductPromoDiscounts
+                .Where(p => p.PromoDiscountId == promoId)
+                .ToListAsync();
+
+            this.db.ProductPromoDiscounts.RemoveRange(productPromoDiscounts);
+
+            await this.db.SaveChangesAsync();
+
+            PromoDiscount promo = await this.db.PromoDiscounts.FirstOrDefaultAsync(p => p.Id == promoId);
+
+            this.db.PromoDiscounts.Remove(promo);
+
+            await this.db.SaveChangesAsync();
+        }
+
+        public async Task Edit(string promoId, PromoDiscountCreateModel data)
+        {
+            if (data.Discount < 0 || data.Discount > 100) throw new ArgumentException("Discount must be between 0 and 100");
+
+            if (!await this.db.PromoDiscounts.AnyAsync(p => p.Id == promoId)) throw new ArgumentException("Cannot find promo in DB");
+
+            PromoDiscount promo = await this.db.PromoDiscounts.FirstOrDefaultAsync(p => p.Id == promoId);
+
+            promo.Name = data.Name;
+            promo.Discount = data.Discount;
+            promo.EndDate = data.EndDate;
+            promo.StartDate = data.StartDate;
+
+            await this.db.SaveChangesAsync();
+        }
+
+        public async Task<PromoDiscountDetailsModel> Get(string promoId)
+        {
+            if (!await this.db.PromoDiscounts.AnyAsync(d => d.Id == promoId)) throw new ArgumentException("Cannot find promo in DB");
+
+            return await this.db.PromoDiscounts
+                .Where(d => d.Id == promoId)
+                .ProjectTo<PromoDiscountDetailsModel>()
+                .FirstOrDefaultAsync();
         }
 
         public async Task<ICollection<PromoDiscountDetailsModel>> GetList()
