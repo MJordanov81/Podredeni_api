@@ -8,6 +8,7 @@
     using Microsoft.AspNetCore.Http;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     [Produces("application/json")]
     [Route("api/[controller]")]
@@ -41,7 +42,7 @@
             {
                 return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
             }
-        } 
+        }
 
         //post api/promoDiscounts
         [HttpPost]
@@ -121,30 +122,32 @@
         }
 
         //post api/promoDiscounts
-        [HttpPost]
-        [Route("assign")]
+        [HttpPut]
+        [Route("assign/{id}")]
         [Authorize]
-        public async Task<ActionResult> Assign([FromQuery]string promotionId, [FromQuery]string productId)
+        public async Task<ActionResult> Assign(string id, [FromBody]string[] productIds)
         {
             if (!this.IsInRole("admin"))
             {
                 return this.StatusCode(StatusCodes.Status401Unauthorized);
             }
 
-            if (string.IsNullOrWhiteSpace(promotionId) || string.IsNullOrWhiteSpace(productId))
+            if (productIds.Length < 1)
             {
                 return this.StatusCode(StatusCodes.Status400BadRequest);
             }
 
             try
             {
-                await this.promoDiscounts.Assign(promotionId, productId);
+                for (int i = 0; i < productIds.Length; i++)
+                {
+                    await this.AssignPromo(id, productIds[i]);
+                }
 
                 return this.Ok();
             }
             catch (Exception e)
             {
-
                 return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
             }
         }
@@ -174,23 +177,26 @@
 
         //post api/promoDiscounts
         [HttpPut]
-        [Route("remove")]
+        [Route("remove/{id}")]
         [Authorize]
-        public async Task<ActionResult> Remove([FromQuery]string promotionId, [FromQuery]string productId)
+        public async Task<ActionResult> Remove(string id, [FromBody]string[] productIds)
         {
             if (!this.IsInRole("admin"))
             {
                 return this.StatusCode(StatusCodes.Status401Unauthorized);
             }
 
-            if (string.IsNullOrWhiteSpace(promotionId) || string.IsNullOrWhiteSpace(productId))
+            if (productIds.Length < 1)
             {
                 return this.StatusCode(StatusCodes.Status400BadRequest);
             }
 
             try
             {
-                await this.promoDiscounts.Assign(promotionId, productId);
+                for (int i = 0; i < productIds.Length; i++)
+                {
+                    await this.RemovePromo(id, productIds[i]);
+                }
 
                 return this.Ok();
             }
@@ -198,6 +204,16 @@
             {
                 return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
             }
+        }
+
+        private async Task AssignPromo(string promoId, string productId)
+        {
+            await this.promoDiscounts.Assign(promoId, productId);
+        }
+
+        private async Task RemovePromo(string promoId, string productId)
+        {
+            await this.promoDiscounts.Remove(promoId, productId);
         }
     }
 }

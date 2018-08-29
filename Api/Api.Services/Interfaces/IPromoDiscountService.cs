@@ -14,6 +14,8 @@
 
         Task Assign(string promoId, string productId);
 
+        Task Remove(string promoId, string productId);
+
         Task Edit(string promoId, PromoDiscountCreateModel data);
 
         Task Delete(string promoId);

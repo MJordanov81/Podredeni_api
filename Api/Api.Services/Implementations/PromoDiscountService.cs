@@ -29,22 +29,16 @@
 
             ProductPromoDiscount existingProductPromoDiscount = await this.db.ProductPromoDiscounts.FirstOrDefaultAsync(d => d.PromoDiscountId == promoId && d.ProductId == productId);
 
-            if (existingProductPromoDiscount != null)
+            if (existingProductPromoDiscount == null)
             {
-                this.db.ProductPromoDiscounts.Remove(existingProductPromoDiscount);
+                ProductPromoDiscount productPromoDiscount = new ProductPromoDiscount
+                {
+                    PromoDiscountId = promoId,
+                    ProductId = productId
+                };
 
-                await this.db.SaveChangesAsync();
-
-                return;
+                await this.db.ProductPromoDiscounts.AddAsync(productPromoDiscount);
             }
-
-            ProductPromoDiscount productPromoDiscount = new ProductPromoDiscount
-            {
-                PromoDiscountId = promoId,
-                ProductId = productId
-            };
-
-            await this.db.ProductPromoDiscounts.AddAsync(productPromoDiscount);
 
             await this.db.SaveChangesAsync();
         }
@@ -108,17 +102,53 @@
         {
             if (!await this.db.PromoDiscounts.AnyAsync(d => d.Id == promoId)) throw new ArgumentException("Cannot find promo in DB");
 
-            return await this.db.PromoDiscounts
+            PromoDiscountDetailsModel model = await this.db.PromoDiscounts
                 .Where(d => d.Id == promoId)
                 .ProjectTo<PromoDiscountDetailsModel>()
                 .FirstOrDefaultAsync();
+
+            model.ProductsIds = await this.GetAssociatedProductsIds(promoId);
+
+            return model;
         }
 
         public async Task<ICollection<PromoDiscountDetailsModel>> GetList()
         {
-            return await this.db.PromoDiscounts
+            ICollection<PromoDiscountDetailsModel> models = await this.db.PromoDiscounts
                 .ProjectTo<PromoDiscountDetailsModel>()
                 .ToListAsync();
+
+            foreach (PromoDiscountDetailsModel model in models)
+            {
+                model.ProductsIds = await this.GetAssociatedProductsIds(model.Id);
+            }
+
+            return models;
+        }
+
+        private async Task<ICollection<string>> GetAssociatedProductsIds(string promoId)
+        {
+            return await this.db.ProductPromoDiscounts
+                .Where(pd => pd.PromoDiscountId == promoId)
+                .Select(pd => pd.ProductId)
+                .ToListAsync();
+        }
+
+        public async Task Remove(string promoId, string productId)
+        {
+            if (!await this.db.PromoDiscounts.AnyAsync(d => d.Id == promoId) || !await this.db.Products.AnyAsync(p => p.Id == productId))
+            {
+                throw new ArgumentException("Either promo or product not found in DB");
+            }
+
+            ProductPromoDiscount existingProductPromoDiscount = await this.db.ProductPromoDiscounts.FirstOrDefaultAsync(d => d.PromoDiscountId == promoId && d.ProductId == productId);
+
+            if (existingProductPromoDiscount != null)
+            {
+                this.db.ProductPromoDiscounts.Remove(existingProductPromoDiscount);
+            }
+
+            await this.db.SaveChangesAsync();
         }
     }
 }
