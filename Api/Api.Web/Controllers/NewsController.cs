@@ -85,6 +85,11 @@
         [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
+            if (!this.IsInRole("admin"))
+            {
+                return this.StatusCode(StatusCodes.Status401Unauthorized);
+            }
+
             try
             {
                 await this.news.Delete(id);

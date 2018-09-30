@@ -93,10 +93,16 @@
         {
             if (!this.db.Products.Any(p => p.Id == id)) throw new ArgumentException(ErrorMessages.InvalidProductId);
 
-            return this.db.Products
+            ProductDetailsModel product = this.db.Products
                 .Where(p => p.Id == id)
                 .ProjectTo<ProductDetailsModel>()
                 .FirstOrDefault();
+
+            product.PromoDiscountsIds = await this.GetAssociatedPromoDiscuntsIds(id);
+
+            product.Discount = await this.CalculateDiscount(id);
+
+            return product;
         }
 
         //Get details for a range of products - filtered, sorted and paginated
@@ -107,18 +113,15 @@
                 .ProjectTo<ProductDetailsModel>()
                 .ToList();
 
-            DateTime today = DateTime.Now.Date;
+            foreach (var product in products)
+            {
+                product.PromoDiscountsIds = await this.GetAssociatedPromoDiscuntsIds(product.Id);
+            }
 
             foreach (ProductDetailsModel product in products)
             {
-                if(db.ProductPromoDiscounts.Any(d => d.ProductId == product.Id))
-                {
-                    product.Discount = db.ProductPromoDiscounts
-                        .Where(d => d.ProductId == product.Id)
-                        .Select(d => d.PromoDiscount)
-                        .Where(d => d.StartDate <= today && d.EndDate >= today)
-                        .Sum(d => d.Discount);
-                }           
+                product.Discount = await this.CalculateDiscount(product.Id);
+   
             }
 
             if (!string.IsNullOrEmpty(pagination.FilterElement))
@@ -149,6 +152,36 @@
                 Products = products,
                 ProductsCount = productsCount
             };
+        }
+
+        private async Task<ICollection<string>> GetAssociatedPromoDiscuntsIds(string productId)
+        {
+            DateTime today = DateTime.Now.Date;
+
+            return await this.db.ProductPromoDiscounts
+                .Where(p => p.ProductId == productId && p.PromoDiscount.StartDate <= today && p.PromoDiscount.EndDate >= today)
+                .Select(p => p.PromoDiscountId)
+                .ToListAsync();
+        }
+
+        private async Task<decimal> CalculateDiscount(string productId)
+        {
+            decimal discount = 0;
+
+            DateTime today = DateTime.Now.Date;
+
+            if (this.db.ProductPromoDiscounts.Any(d => d.ProductId == productId))
+            {
+                discount = this.db.ProductPromoDiscounts
+                    .Where(d => d.ProductId == productId)
+                    .Select(d => d.PromoDiscount)
+                    .Where(d => d.StartDate <= today && d.EndDate >= today)
+                    .Sum(d => d.Discount);
+            }
+
+            //if (discount > 100) discount = 100;
+
+            return discount;
         }
 
         #region "FilterAndSort"

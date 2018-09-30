@@ -19,7 +19,7 @@
 
         public async Task<string> Create(string url, string productId)
         {
-            if(url != null)
+            if(!string.IsNullOrWhiteSpace(url))
             {
                 Image image = new Image { Url = url, ProductId = productId, CreationDateTime = DateTime.Now };
 

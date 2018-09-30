@@ -216,14 +216,13 @@
         private async Task CreateProductOrders(string orderId, ICollection<ProductOrderCreateModel> products)
         {
             foreach (var product in products)
-            {
+            {        
                 ProductOrder po = new ProductOrder
                 {
                     OrderId = orderId,
                     ProductId = product.ProductId,
                     Quantity = product.Quantity,
                     Price = product.Price
-
                 };
 
                 await this.db.ProductOrders.AddAsync(po);

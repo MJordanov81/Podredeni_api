@@ -46,6 +46,8 @@
 
         public DbSet<ProductPromoDiscount> ProductPromoDiscounts { get; set; }
 
+        public DbSet<Video> Videos { get; set; }
+
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)

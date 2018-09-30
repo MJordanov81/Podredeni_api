@@ -9,7 +9,7 @@
 
         public const string UnableToWriteToDb = "Unable to write to database!";
 
-        public const string InvalidImageUrl = "Invalid image url";
+        public const string InvalidImageUrl = "Image URL cannot be null or empty string";
 
         public const string InvalidType = "Type cannot be null";
 
@@ -45,5 +45,10 @@
         public const string InvalidNewsParameters = "News title, content and/or image url cannot be null or empty";
 
         public const string InvalidNewsId = "News with the given id does not exist";
+
+        //VIDEO
+        public const string InvalidVideoUrl = "Video URL cannot be null or empty string";
+
+        public const string InvalidVideoId = "Video with the given id does not exist";
     }
 }

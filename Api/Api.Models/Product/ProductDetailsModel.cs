@@ -30,6 +30,8 @@
 
         public decimal Discount { get; set; }
 
+        public ICollection<string> PromoDiscountsIds { get; set; }
+
         public void ConfigureMapping(Profile mapper)
         {
             mapper.CreateMap<Product, ProductDetailsModel>()

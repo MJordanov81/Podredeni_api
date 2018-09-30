@@ -49,6 +49,10 @@
         [Authorize]
         public async Task<IActionResult> Create([FromBody]PromoDiscountCreateModel model)
         {
+
+            string ert = "";
+
+
             if (!this.IsInRole("admin"))
             {
                 return this.StatusCode(StatusCodes.Status401Unauthorized);
@@ -127,6 +131,9 @@
         [Authorize]
         public async Task<ActionResult> Assign(string id, [FromBody]string[] productIds)
         {
+
+            string wer = "";
+
             if (!this.IsInRole("admin"))
             {
                 return this.StatusCode(StatusCodes.Status401Unauthorized);
