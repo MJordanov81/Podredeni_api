@@ -10,6 +10,6 @@
 
         Task Delete(string videoId);
 
-        Task<IEnumerable<VideoDetailsModel>> GetAll();
+        Task<IEnumerable<VideoDetailsModel>> Get();
     }
 }

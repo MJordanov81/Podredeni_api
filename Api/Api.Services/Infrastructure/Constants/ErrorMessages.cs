@@ -50,5 +50,10 @@
         public const string InvalidVideoUrl = "Video URL cannot be null or empty string";
 
         public const string InvalidVideoId = "Video with the given id does not exist";
+
+        //PARTNER
+        public const string InvalidPartnerCreateData = "Partner name and/or details cannot be null or empty";
+
+        public const string InvalidPartnerId = "Partner with the given id does not exist";
     }
 }

@@ -112,6 +112,16 @@
 
         #endregion
 
+        #region "Partner"
+
+        public const int PartnerNameMaxLength = 150;
+        public const string PartnerNameLengthError = "Partner name length cannot exceed 150 characters";
+
+        public const int PartnerDetailsMaxLength = 4000;
+        public const string PartnerDetailsLengthError = "Partner details length cannot exceed 4000 characters";
+
+        #endregion
+
         public const string AnonymousUser = "Anonymous user";
     }
 }

@@ -3,12 +3,10 @@
     using Api.Models.PromoDiscount;
     using Api.Services.Interfaces;
     using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
-    using System;
+    using Microsoft.AspNetCore.Mvc;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Threading.Tasks;
 
     [Produces("application/json")]
     [Route("api/[controller]")]
@@ -27,21 +25,29 @@
         [Authorize]
         public async Task<IActionResult> Get(string id)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
 
-            try
+            return await this.Execute(true, false, async () =>
             {
                 PromoDiscountDetailsModel result = await this.promoDiscounts.Get(id);
 
                 return this.Ok(result);
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //try
+            //{
+            //    PromoDiscountDetailsModel result = await this.promoDiscounts.Get(id);
+
+            //    return this.Ok(result);
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //post api/promoDiscounts
@@ -49,30 +55,33 @@
         [Authorize]
         public async Task<IActionResult> Create([FromBody]PromoDiscountCreateModel model)
         {
-
-            string ert = "";
-
-
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest(this.ModelState);
-            }
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 string promoDiscountId = await this.promoDiscounts.Create(model);
 
                 return this.Ok(new { promoDiscountId = promoDiscountId });
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.BadRequest(this.ModelState);
+            //}
+
+            //try
+            //{
+            //    string promoDiscountId = await this.promoDiscounts.Create(model);
+
+            //    return this.Ok(new { promoDiscountId = promoDiscountId });
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //post api/promoDiscounts/id
@@ -81,26 +90,33 @@
         [Authorize]
         public async Task<IActionResult> Edit(string id, [FromBody] PromoDiscountCreateModel model)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest(this.ModelState);
-            }
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 await this.promoDiscounts.Edit(id, model);
 
                 return this.Ok();
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.BadRequest(this.ModelState);
+            //}
+
+            //try
+            //{
+            //    await this.promoDiscounts.Edit(id, model);
+
+            //    return this.Ok();
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //post api/promoDiscounts
@@ -108,43 +124,42 @@
         [Authorize]
         public async Task<IActionResult> GetList()
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            try
+            return await this.Execute(true, false, async () =>
             {
                 ICollection<PromoDiscountDetailsModel> result = await this.promoDiscounts.GetList();
 
                 return this.Ok(result);
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //try
+            //{
+            //    ICollection<PromoDiscountDetailsModel> result = await this.promoDiscounts.GetList();
+
+            //    return this.Ok(result);
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //post api/promoDiscounts
         [HttpPut]
         [Route("assign/{id}")]
         [Authorize]
-        public async Task<ActionResult> Assign(string id, [FromBody]string[] productIds)
+        public async Task<IActionResult> Assign(string id, [FromBody]string[] productIds)
         {
-
-            string wer = "";
-
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
             if (productIds.Length < 1)
             {
                 return this.StatusCode(StatusCodes.Status400BadRequest);
             }
 
-            try
+            return await this.Execute(true, false, async () =>
             {
                 for (int i = 0; i < productIds.Length; i++)
                 {
@@ -152,11 +167,32 @@
                 }
 
                 return this.Ok();
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (productIds.Length < 1)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest);
+            //}
+
+            //try
+            //{
+            //    for (int i = 0; i < productIds.Length; i++)
+            //    {
+            //        await this.AssignPromo(id, productIds[i]);
+            //    }
+
+            //    return this.Ok();
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //post api/promoDiscounts/id
@@ -165,40 +201,42 @@
         [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            try
+            return await this.Execute(true, false, async () =>
             {
                 await this.promoDiscounts.Delete(id);
 
                 return this.Ok();
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //try
+            //{
+            //    await this.promoDiscounts.Delete(id);
+
+            //    return this.Ok();
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //post api/promoDiscounts
         [HttpPut]
         [Route("remove/{id}")]
         [Authorize]
-        public async Task<ActionResult> Remove(string id, [FromBody]string[] productIds)
+        public async Task<IActionResult> Remove(string id, [FromBody]string[] productIds)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
             if (productIds.Length < 1)
             {
                 return this.StatusCode(StatusCodes.Status400BadRequest);
             }
 
-            try
+            return await this.Execute(true, false, async () =>
             {
                 for (int i = 0; i < productIds.Length; i++)
                 {
@@ -206,11 +244,32 @@
                 }
 
                 return this.Ok();
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (productIds.Length < 1)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest);
+            //}
+
+            //try
+            //{
+            //    for (int i = 0; i < productIds.Length; i++)
+            //    {
+            //        await this.RemovePromo(id, productIds[i]);
+            //    }
+
+            //    return this.Ok();
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         private async Task AssignPromo(string promoId, string productId)

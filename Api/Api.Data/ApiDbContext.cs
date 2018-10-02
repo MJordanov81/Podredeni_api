@@ -48,6 +48,8 @@
 
         public DbSet<Video> Videos { get; set; }
 
+        public DbSet<Partner> Partners { get; set; }
+
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)

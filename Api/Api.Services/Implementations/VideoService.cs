@@ -54,7 +54,7 @@
             await this.db.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<VideoDetailsModel>> GetAll()
+        public async Task<IEnumerable<VideoDetailsModel>> Get()
         {
             return await this.db.Videos
                 .ProjectTo<VideoDetailsModel>()
