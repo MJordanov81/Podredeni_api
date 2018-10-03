@@ -13,5 +13,7 @@ namespace Api.Services.Interfaces
         Task<PartnerDetailsModel> Get(string partnerId);
 
         Task<IEnumerable<PartnerDetailsModel>> Get();
+
+        Task Delete(string partnerId);
     }
 }

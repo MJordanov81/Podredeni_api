@@ -69,5 +69,19 @@
                 return this.Ok(new { partnerId = id });
             });
         }
+
+        //delete api/partners/id
+        [HttpDelete]
+        [Route("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Delete(string id)
+        {
+            return await Execute(true, false, async () =>
+            {
+                await this.partners.Delete(id);
+
+                return this.Ok();
+            });
+        }
     }
 }

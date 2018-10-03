@@ -76,5 +76,17 @@
                 .ProjectTo<PartnerDetailsModel>()
                 .ToListAsync();
         }
+
+        public async Task Delete(string partnerId)
+        {
+            if (!await this.db.Partners.AnyAsync(p => p.Id == partnerId))
+                throw new ArgumentException(ErrorMessages.InvalidPartnerId);
+
+            Partner partner = await this.db.Partners.FirstOrDefaultAsync(p => p.Id == partnerId);
+
+            this.db.Partners.Remove(partner);
+
+            await this.db.SaveChangesAsync();
+        }
     }
 }
