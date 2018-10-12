@@ -5,6 +5,7 @@
     using Api.Services.Interfaces;
     using Api.Web.Infrastructure.Constants;
     using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Cors;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using System;

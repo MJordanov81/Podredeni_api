@@ -122,6 +122,16 @@
 
         #endregion
 
+        #region Video
+
+        public const int VideoDescriptionLength = 200;
+        public const string VideoDescriptionLengthError = "Video description length cannot exceed 200 characters";
+
+        public const int VideoUrlLength = 2000;
+        public const string VideoUrlLengthError = "Video Url length cannot exceed 2000 characters";
+
+        #endregion
+
         public const string AnonymousUser = "Anonymous user";
     }
 }

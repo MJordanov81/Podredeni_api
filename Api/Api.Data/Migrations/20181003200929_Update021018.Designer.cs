@@ -12,9 +12,10 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181003200929_Update021018")]
+    partial class Update021018
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -483,12 +484,6 @@ namespace Api.Data.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(200);
-
-                    b.Property<int>("Index");
 
                     b.Property<string>("Url")
                         .IsRequired()

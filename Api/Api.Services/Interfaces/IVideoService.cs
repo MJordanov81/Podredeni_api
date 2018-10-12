@@ -6,10 +6,12 @@
 
     public interface IVideoService
     {
-        Task<string> Create(string url);
+        Task<string> Create(VideoCreateModel data);
 
         Task Delete(string videoId);
 
         Task<IEnumerable<VideoDetailsModel>> Get();
+
+        Task Reorder(string[] orderedVideoIds);
     }
 }

@@ -1,7 +1,6 @@
 ﻿namespace Api.Web.Controllers
 {
     using Api.Models.Video;
-    using Api.Services.Implementations;
     using Api.Services.Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
@@ -12,9 +11,9 @@
     [Route("api/[controller]")]
     public class VideosController : BaseController
     {
-        private readonly VideoService videos;
+        private readonly IVideoService videos;
 
-        public VideosController(IUserService users, VideoService videos) : base(users)
+        public VideosController(IUserService users, IVideoService videos) : base(users)
         {
             this.videos = videos;
         }
@@ -22,12 +21,11 @@
         //post api/videos
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Create([FromBody] string url)
+        public async Task<IActionResult> Create([FromBody] VideoCreateModel video)
         {
-
             return await this.Execute(true, true, async () =>
             {
-                string id = await this.videos.Create(url);
+                string id = await this.videos.Create(video);
 
                 return this.Ok(new { videoId = id });
             });
@@ -55,6 +53,20 @@
             return await this.Execute(true, false, async () =>
             {
                 await this.videos.Delete(id);
+
+                return this.Ok();
+            });
+        }
+
+        //post api/videos/reorder
+        [HttpPost]
+        [Route("reorder")]
+        [Authorize]
+        public async Task<IActionResult> Reorder([FromBody] string[] orderedVideoIds)
+        {
+            return await this.Execute(true, false, async () =>
+            {
+                await this.videos.Reorder(orderedVideoIds);
 
                 return this.Ok();
             });

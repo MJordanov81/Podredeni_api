@@ -47,7 +47,7 @@
         public const string InvalidNewsId = "News with the given id does not exist";
 
         //VIDEO
-        public const string InvalidVideoUrl = "Video URL cannot be null or empty string";
+        public const string InvalidVideoCreateData = "Video URL and description cannot be null or empty string";
 
         public const string InvalidVideoId = "Video with the given id does not exist";
 
