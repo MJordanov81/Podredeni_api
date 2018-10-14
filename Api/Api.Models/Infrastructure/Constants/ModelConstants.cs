@@ -122,7 +122,27 @@
 
         #endregion
 
-        #region Video
+        #region "Promotion"
+
+        public const int PromotionNameMinLength = 3;
+        public const int PromotionNameMaxLength = 150;
+        public const string PromotionNameLengthError = "Promotion name must be between 3 and 150 characters long";
+
+        public const int PromotionPromoCodeMinLength = 6;
+        public const int PromotionPromoCodeMaxLength = 20;
+        public const string PromotionPromoCodeLengthError = "Promotion promocode must be between 6 and 20 characters long";
+
+        public const string PromotionProductsCountError = "Products must be greater than 1";
+
+        public const string PromotionDiscountedProductsCountError = "Discounted products must be greater than 1";
+
+        public const string PromotionDiscountError = "Dicount must be a positive decimal number";
+
+        public const string PromotionQuotaError = "Quota must be a positive integer";
+
+        #endregion
+
+        #region "Video"
 
         public const int VideoDescriptionLength = 200;
         public const string VideoDescriptionLengthError = "Video description length cannot exceed 200 characters";

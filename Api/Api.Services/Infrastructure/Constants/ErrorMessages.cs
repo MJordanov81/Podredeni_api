@@ -55,5 +55,10 @@
         public const string InvalidPartnerCreateData = "Partner name and/or details cannot be null or empty";
 
         public const string InvalidPartnerId = "Partner with the given id does not exist";
+
+        //PROMOTION
+        public const string InvalidPromotionDates = "Start date cannot be later than end date";
+
+        public const string InvalidPromotionProductsCount = "Please provide at least one product and one discounted product";
     }
 }

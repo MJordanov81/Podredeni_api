@@ -46,6 +46,12 @@
 
         public DbSet<ProductPromoDiscount> ProductPromoDiscounts { get; set; }
 
+        public DbSet<Promotion> Promotions { get; set; }
+
+        public DbSet<ProductPromotion> ProductsPromotions { get; set; }
+
+        public DbSet<DiscountedProductPromotion> DiscountedProductsPromotions { get; set; }
+
         public DbSet<Video> Videos { get; set; }
 
         public DbSet<Partner> Partners { get; set; }
@@ -69,6 +75,12 @@
             builder.ApplyConfiguration(new PromoDiscountConfiguration());
 
             builder.ApplyConfiguration(new ProductPromoDiscountConfiguration());
+
+            builder.ApplyConfiguration(new PromotionConfiguration());
+
+            builder.ApplyConfiguration(new ProductPromotionConfiguration());
+
+            builder.ApplyConfiguration(new DiscountedProductPromotionConfiguration());
 
             base.OnModelCreating(builder);
         }

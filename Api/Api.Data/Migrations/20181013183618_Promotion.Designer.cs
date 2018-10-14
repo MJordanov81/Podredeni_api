@@ -12,9 +12,10 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181013183618_Promotion")]
+    partial class Promotion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -476,15 +477,11 @@ namespace Api.Data.Migrations
 
                     b.Property<bool>("IsInclusive");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150);
+                    b.Property<string>("Name");
 
                     b.Property<int>("ProductsCount");
 
-                    b.Property<string>("PromoCode")
-                        .IsRequired()
-                        .HasMaxLength(20);
+                    b.Property<string>("PromoCode");
 
                     b.Property<int>("Quota");
 
