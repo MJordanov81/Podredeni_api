@@ -14,6 +14,8 @@ namespace Api.Services.Interfaces
 
         Task<IEnumerable<PartnerDetailsModel>> Get();
 
+        Task<Dictionary<string, List<PartnerDetailsModel>>> GetGoupedByCity();
+
         Task Delete(string partnerId);
     }
 }

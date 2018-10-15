@@ -52,9 +52,11 @@
         public const string InvalidVideoId = "Video with the given id does not exist";
 
         //PARTNER
-        public const string InvalidPartnerCreateData = "Partner name and/or details cannot be null or empty";
+        public const string InvalidPartnerCreateData = "Partner name and/or category cannot be null or empty";
 
         public const string InvalidPartnerId = "Partner with the given id does not exist";
+
+        public const string InvalidPartnerLocationCreationData = "PartnerLocation city and/or address cannot be null or an empty strings";
 
         //PROMOTION
         public const string InvalidPromotionDates = "Start date cannot be later than end date";

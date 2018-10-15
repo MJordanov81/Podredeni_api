@@ -1,16 +1,16 @@
 ﻿namespace Api.Services.Implementations
 {
-    using System.Threading.Tasks;
     using Api.Data;
-    using Api.Models.Partner;
-    using Api.Services.Interfaces;
-    using System;
-    using Api.Services.Infrastructure.Constants;
     using Api.Domain.Entities;
-    using Microsoft.EntityFrameworkCore;
-    using System.Linq;
+    using Api.Models.Partner;
+    using Api.Services.Infrastructure.Constants;
+    using Api.Services.Interfaces;
     using AutoMapper.QueryableExtensions;
+    using Microsoft.EntityFrameworkCore;
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     public class PartnerService : IPartnerService
     {
@@ -23,7 +23,7 @@
 
         public async Task<string> Create(PartnerCreateEditModel data)
         {
-            if (string.IsNullOrWhiteSpace(data.Name) || string.IsNullOrWhiteSpace(data.Details))
+            if (string.IsNullOrWhiteSpace(data.Name) || string.IsNullOrWhiteSpace(data.Category))
                 throw new ArgumentException(ErrorMessages.InvalidPartnerCreateData);
 
             Partner partner = new Partner
@@ -31,22 +31,27 @@
                 Name = data.Name,
                 LogoUrl = !string.IsNullOrWhiteSpace(data.LogoUrl) ? data.LogoUrl : "",
                 WebUrl = !string.IsNullOrWhiteSpace(data.WebUrl) ? data.WebUrl : "",
-                Details = data.Details
+                Category = data.Category
             };
 
             await this.db.Partners.AddAsync(partner);
 
             await this.db.SaveChangesAsync();
 
+            if (data.PartnerLocations.Count > 0)
+            {
+                await this.CreatePartnerLocations(partner.Id, data.PartnerLocations);
+            }
+
             return partner.Id;
         }
 
         public async Task Edit(string partnerId, PartnerCreateEditModel data)
         {
-            if (string.IsNullOrWhiteSpace(data.Name) || string.IsNullOrWhiteSpace(data.Details))
+            if (string.IsNullOrWhiteSpace(data.Name) || string.IsNullOrWhiteSpace(data.Category))
                 throw new ArgumentException(ErrorMessages.InvalidPartnerCreateData);
 
-            if(!await this.db.Partners.AnyAsync(p => p.Id == partnerId))
+            if (!await this.db.Partners.AnyAsync(p => p.Id == partnerId))
                 throw new ArgumentException(ErrorMessages.InvalidPartnerId);
 
             Partner partner = await this.db.Partners.FirstOrDefaultAsync(p => p.Id == partnerId);
@@ -54,9 +59,13 @@
             partner.Name = data.Name;
             partner.LogoUrl = data.LogoUrl;
             partner.WebUrl = data.WebUrl;
-            partner.Details = data.Details;
+            partner.Category = data.Category;
 
             await this.db.SaveChangesAsync();
+
+            await this.DeletePartnerLocations(partner.Id);
+
+            if (data.PartnerLocations.Count > 0) await this.CreatePartnerLocations(partner.Id, data.PartnerLocations);
         }
 
         public async Task<PartnerDetailsModel> Get(string partnerId)
@@ -64,17 +73,74 @@
             if (!await this.db.Partners.AnyAsync(p => p.Id == partnerId))
                 throw new ArgumentException(ErrorMessages.InvalidPartnerId);
 
-            return await this.db.Partners
+            return this.db.Partners
                 .Where(p => p.Id == partnerId)
                 .ProjectTo<PartnerDetailsModel>()
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
         }
+
 
         public async Task<IEnumerable<PartnerDetailsModel>> Get()
         {
-            return await this.db.Partners
+            return this.db.Partners
                 .ProjectTo<PartnerDetailsModel>()
-                .ToListAsync();
+                .ToList();
+        }
+
+        public async Task<Dictionary<string, List<PartnerDetailsModel>>> GetGoupedByCity()
+        {
+            SortedSet<string> sortedCities =
+                new SortedSet<string>(this.db.PartnerLocations.Select(pl => pl.City).ToHashSet());
+
+            Dictionary<string, List<PartnerDetailsModel>> result = new Dictionary<string, List<PartnerDetailsModel>>();
+
+            foreach (string city in sortedCities)
+            {
+                result.Add(city, new List<PartnerDetailsModel>());
+            }
+
+            result.Add("n/a", new List<PartnerDetailsModel>());
+
+            ICollection<PartnerDetailsModel> partners = this.db.Partners
+                .ProjectTo<PartnerDetailsModel>()
+                .ToList();
+
+            foreach (PartnerDetailsModel partner in partners)
+            {
+                HashSet<string> partnerCities = partner.PartnerLocations.Select(pl => pl.City).ToHashSet();
+
+                foreach (string city in partnerCities)
+                {
+                    result[city].Add(new PartnerDetailsModel()
+                    {
+                        Id = partner.Id,
+                        Name = partner.Name,
+                        WebUrl = partner.WebUrl,
+                        LogoUrl = partner.LogoUrl,
+                        Category = partner.Category,
+                        PartnerLocations = partner.PartnerLocations.Where(pl => pl.City == city).ToList()
+                    });
+                }
+
+                if (partnerCities.Count == 0)
+                {
+                    result["n/a"].Add(new PartnerDetailsModel
+                    {
+                        Id = partner.Id,
+                        Name = partner.Name,
+                        WebUrl = partner.WebUrl,
+                        LogoUrl = partner.LogoUrl,
+                        Category = partner.Category
+                    });
+                }
+            }
+
+            if (result["n/a"].Count == 0)
+            {
+                result.Remove("n/a");
+            }
+
+            return result;
         }
 
         public async Task Delete(string partnerId)
@@ -84,7 +150,37 @@
 
             Partner partner = await this.db.Partners.FirstOrDefaultAsync(p => p.Id == partnerId);
 
+            await this.DeletePartnerLocations(partner.Id);
+
             this.db.Partners.Remove(partner);
+
+            await this.db.SaveChangesAsync();
+        }
+
+        private async Task CreatePartnerLocations(string partnerId, ICollection<PartnerLocationCreateModel> partnerLocations)
+        {
+            foreach (PartnerLocationCreateModel partnerLocation in partnerLocations)
+            {
+                if (string.IsNullOrWhiteSpace(partnerLocation.City) || string.IsNullOrWhiteSpace(partnerLocation.Address)) throw new ArgumentException(ErrorMessages.InvalidPartnerLocationCreationData);
+
+                await this.db.PartnerLocations.AddAsync(new PartnerLocation
+                {
+                    City = partnerLocation.City,
+                    Address = partnerLocation.Address,
+                    PartnerId = partnerId
+                });
+
+                await this.db.SaveChangesAsync();
+            }
+        }
+
+        private async Task DeletePartnerLocations(string partnerId)
+        {
+            ICollection<PartnerLocation> partnerLocations = await this.db.PartnerLocations
+                .Where(pl => pl.PartnerId == partnerId)
+                .ToListAsync();
+
+            this.db.RemoveRange(partnerLocations);
 
             await this.db.SaveChangesAsync();
         }

@@ -117,8 +117,18 @@
         public const int PartnerNameMaxLength = 150;
         public const string PartnerNameLengthError = "Partner name length cannot exceed 150 characters";
 
-        public const int PartnerDetailsMaxLength = 4000;
-        public const string PartnerDetailsLengthError = "Partner details length cannot exceed 4000 characters";
+        public const int PartnerCategoryMaxLength = 20;
+        public const string PartnerCategoryLengthError = "Partner category length cannot exceed 20 characters";
+
+        #endregion
+
+        #region "PartnerLocation"
+
+        public const int PartnerLocationCityMaxLength = 50;
+        public const string PartnerLocationCityLengthError = "Partner location city length cannot exceed 50 characters";
+
+        public const int PartnerLocationAddressMaxLength = 300;
+        public const string PartnerLocationAddressLengthError = "Partner location address length cannot exceed 300 characters";
 
         #endregion
 

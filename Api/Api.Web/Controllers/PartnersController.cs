@@ -4,7 +4,7 @@
     using Api.Services.Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
     [Produces("application/json")]
@@ -31,15 +31,28 @@
             });
         }
 
+        //get api/partners/groupedByCity
+        [HttpGet]
+        [Route("groupedbycity")]
+        public async Task<IActionResult> GetGroupedByCity()
+        {
+            return await Execute(false, false, async () =>
+            {
+                var partners = await this.partners.GetGoupedByCity();
+
+                return this.Ok(partners.ToList());
+            });
+        }
+
         //get api/partners
         [HttpGet]
         public async Task<IActionResult> Get()
         {
             return await Execute(false, false, async () =>
             {
-                IEnumerable<PartnerDetailsModel> partners = await this.partners.Get();
+                var partners = await this.partners.Get();
 
-                return this.Ok(partners);
+                return this.Ok(partners.ToList());
             });
         }
 

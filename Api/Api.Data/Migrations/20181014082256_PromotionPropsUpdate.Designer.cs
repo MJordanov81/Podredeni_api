@@ -12,9 +12,10 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181014082256_PromotionPropsUpdate")]
+    partial class PromotionPropsUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -351,9 +352,9 @@ namespace Api.Data.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Category")
+                    b.Property<string>("Details")
                         .IsRequired()
-                        .HasMaxLength(20);
+                        .HasMaxLength(4000);
 
                     b.Property<string>("LogoUrl");
 
@@ -366,28 +367,6 @@ namespace Api.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Partners");
-                });
-
-            modelBuilder.Entity("Api.Domain.Entities.PartnerLocation", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(300);
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.Property<string>("PartnerId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PartnerId");
-
-                    b.ToTable("PartnerLocations");
                 });
 
             modelBuilder.Entity("Api.Domain.Entities.Product", b =>
@@ -659,13 +638,6 @@ namespace Api.Data.Migrations
                     b.HasOne("Api.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Api.Domain.Entities.PartnerLocation", b =>
-                {
-                    b.HasOne("Api.Domain.Entities.Partner", "Partner")
-                        .WithMany("PartnerLocations")
-                        .HasForeignKey("PartnerId");
                 });
 
             modelBuilder.Entity("Api.Domain.Entities.ProductOrder", b =>

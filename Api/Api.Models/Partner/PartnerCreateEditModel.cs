@@ -1,6 +1,7 @@
 ﻿namespace Api.Models.Partner
 {
     using Api.Models.Infrastructure.Constants;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
     public class PartnerCreateEditModel
@@ -15,8 +16,10 @@
         public string WebUrl { get; set; }
 
         [Required]
-        [StringLength(ModelConstants.PartnerDetailsMaxLength,
-            ErrorMessage = ModelConstants.PartnerDetailsLengthError)]
-        public string Details { get; set; }
+        [StringLength(ModelConstants.PartnerCategoryMaxLength,
+            ErrorMessage = ModelConstants.PartnerCategoryLengthError)]
+        public string Category { get; set; }
+
+        public ICollection<PartnerLocationCreateModel> PartnerLocations { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace Api.Domain.Entities
 {
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
     public class Partner
@@ -15,7 +16,9 @@
         public string WebUrl { get; set; }
 
         [Required]
-        [StringLength(4000)]
-        public string Details { get; set; }
+        [StringLength(20)]
+        public string Category { get; set; }
+
+        public ICollection<PartnerLocation> PartnerLocations { get; set; } = new List<PartnerLocation>();
     }
 }
