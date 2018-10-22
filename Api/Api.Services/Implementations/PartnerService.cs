@@ -26,12 +26,15 @@
             if (string.IsNullOrWhiteSpace(data.Name) || string.IsNullOrWhiteSpace(data.Category))
                 throw new ArgumentException(ErrorMessages.InvalidPartnerCreateData);
 
+            await this.ReindexPartners(); //Increment each partner's index with 1, so that the new partner comes first
+
             Partner partner = new Partner
             {
                 Name = data.Name,
                 LogoUrl = !string.IsNullOrWhiteSpace(data.LogoUrl) ? data.LogoUrl : "",
                 WebUrl = !string.IsNullOrWhiteSpace(data.WebUrl) ? data.WebUrl : "",
-                Category = data.Category
+                Category = data.Category,
+                Index = 1
             };
 
             await this.db.Partners.AddAsync(partner);
@@ -83,12 +86,15 @@
         public async Task<IEnumerable<PartnerDetailsModel>> Get()
         {
             return this.db.Partners
+                .OrderBy(p => p.Index)
                 .ProjectTo<PartnerDetailsModel>()
                 .ToList();
         }
 
         public async Task<Dictionary<string, List<PartnerDetailsModel>>> GetGoupedByCity()
         {
+            //await this.IndexatePartners();
+
             SortedSet<string> sortedCities =
                 new SortedSet<string>(this.db.PartnerLocations.Select(pl => pl.City).ToHashSet());
 
@@ -102,6 +108,7 @@
             result.Add("n/a", new List<PartnerDetailsModel>());
 
             ICollection<PartnerDetailsModel> partners = this.db.Partners
+                .OrderBy(p => p.Index)
                 .ProjectTo<PartnerDetailsModel>()
                 .ToList();
 
@@ -184,5 +191,55 @@
 
             await this.db.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Re-index partners according to the order of input array of partners ids
+        /// </summary>
+        /// <param name="orderedPartnersIds"></param>
+        /// <returns></returns>
+        public async Task Reorder(string[] orderedPartnersIds)
+        {
+            IEnumerable<Partner> partners = await this.db.Partners.ToListAsync();
+
+            foreach (Partner partner in partners)
+            {
+                int index = Array.IndexOf(orderedPartnersIds, partner.Id);
+
+                partner.Index = ++index;
+            }
+
+            await this.db.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Increments each partner's id with 1
+        /// </summary>
+        /// <returns></returns>
+        private async Task ReindexPartners()
+        {
+            IEnumerable<Partner> partners = await this.db.Partners.ToListAsync();
+
+            foreach (Partner partner in partners)
+            {
+                partner.Index++;
+            }
+
+            await this.db.SaveChangesAsync();
+        }
+
+        private async Task IndexatePartners()
+        {
+            IEnumerable<Partner> partners = await this.db.Partners.ToListAsync();
+
+            int index = 1;
+
+            foreach (Partner partner in partners)
+            {
+                partner.Index = index++;
+            }
+
+            await this.db.SaveChangesAsync();
+        }
+
     }
 }

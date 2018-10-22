@@ -19,6 +19,9 @@
         [StringLength(20)]
         public string Category { get; set; }
 
+        [Range(1, int.MaxValue)]
+        public int Index { get; set; }
+
         public ICollection<PartnerLocation> PartnerLocations { get; set; } = new List<PartnerLocation>();
     }
 }

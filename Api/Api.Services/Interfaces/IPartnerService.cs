@@ -17,5 +17,7 @@ namespace Api.Services.Interfaces
         Task<Dictionary<string, List<PartnerDetailsModel>>> GetGoupedByCity();
 
         Task Delete(string partnerId);
+
+        Task Reorder(string[] orderedPartnerIds);
     }
 }

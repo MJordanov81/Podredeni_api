@@ -96,5 +96,19 @@
                 return this.Ok();
             });
         }
+
+        //post api/partners/reorder
+        [HttpPost]
+        [Route("reorder")]
+        [Authorize]
+        public async Task<IActionResult> Reorder([FromBody] string[] orderedPartnerIds)
+        {
+            return await this.Execute(true, false, async () =>
+            {
+                await this.partners.Reorder(orderedPartnerIds);
+
+                return this.Ok();
+            });
+        }
     }
 }

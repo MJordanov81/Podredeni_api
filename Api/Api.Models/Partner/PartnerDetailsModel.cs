@@ -18,6 +18,8 @@
 
         public string Category { get; set; }
 
+        public int Index { get; set; }
+
         public ICollection<PartnerLocationDetailsModel> PartnerLocations { get; set; }
 
         public void ConfigureMapping(Profile mapper)
