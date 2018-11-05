@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 using System;
-using System.Collections.Generic;
 
 namespace Api.Data.Migrations
 {
-    public partial class Promotion : Migration
+    public partial class PromotionFirst : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

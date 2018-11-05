@@ -13,7 +13,7 @@ namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
     [Migration("20181013183618_Promotion")]
-    partial class Promotion
+    partial class PromotionFirst
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

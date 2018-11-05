@@ -4,9 +4,7 @@
     using Api.Models.Shared;
     using Api.Services.Interfaces;
     using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using System;
     using System.Threading.Tasks;
 
     [Produces("application/json")]
@@ -30,16 +28,30 @@
 
             if (pagination.SortElement == null) pagination.SortElement = "";
 
-            try
+            return await this.Execute(false, false, async () =>
             {
                 ProductDetailsListPaginatedModel result = await products.GetAll(pagination, includeBlocked);
 
                 return this.Ok(result);
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+
+            //if (pagination.FilterElement == null) pagination.FilterElement = "";
+
+            //if (pagination.FilterValue == null) pagination.FilterValue = "";
+
+            //if (pagination.SortElement == null) pagination.SortElement = "";
+
+            //try
+            //{
+            //    ProductDetailsListPaginatedModel result = await products.GetAll(pagination, includeBlocked);
+
+            //    return this.Ok(result);
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
 
         }
 
@@ -48,18 +60,23 @@
         [Route("{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            try
+            return await this.Execute(false, false, async () =>
             {
                 ProductDetailsModel product = await this.products.Get(id);
 
-
-
                 return this.Ok(new { product = product });
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //try
+            //{
+            //    ProductDetailsModel product = await this.products.Get(id);
+
+            //    return this.Ok(new { product = product });
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //put api/products/{id}
@@ -68,26 +85,34 @@
         [Authorize]
         public async Task<IActionResult> Edit(string id, [FromBody]ProductEditModel product)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
 
-            if (!ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 await this.products.Edit(id, product);
 
                 return this.Ok(new { productId = id });
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //try
+            //{
+            //    await this.products.Edit(id, product);
+
+            //    return this.Ok(new { productId = id });
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //post api/products
@@ -95,26 +120,33 @@
         [Authorize]
         public async Task<IActionResult> Create([FromBody]ProductCreateModel product)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 string productId = await this.products.Create(product);
 
                 return this.Ok(new { productId = productId });
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //try
+            //{
+            //    string productId = await this.products.Create(product);
+
+            //    return this.Ok(new { productId = productId });
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
     }
 }

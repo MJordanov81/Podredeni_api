@@ -36,8 +36,6 @@
             {
                 return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
             }
-
-
         }
 
 
@@ -45,27 +43,34 @@
         [Route("articles")]
         public async Task<IActionResult> Modify([FromBody]HomeContentCreateEditModel content)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 await this.homeContent.ModifyArticle(content);
 
                 return this.Ok("Content has been modified");
-            }
+            });
 
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //try
+            //{
+            //    await this.homeContent.ModifyArticle(content);
+
+            //    return this.Ok("Content has been modified");
+            //}
+
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         [Authorize]
@@ -73,27 +78,34 @@
         [Route("carousel/items")]
         public async Task<IActionResult> CreateItem([FromBody]CarouselItemCreateEditModel item)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 string carouselItemId = await this.homeContent.CreateCarouselItem(item);
 
                 return this.Ok(new { carouselItemId = carouselItemId });
-            }
+            });
 
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //try
+            //{
+            //    string carouselItemId = await this.homeContent.CreateCarouselItem(item);
+
+            //    return this.Ok(new { carouselItemId = carouselItemId });
+            //}
+
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         [Authorize]
@@ -101,27 +113,34 @@
         [Route("carousel/items/{id}")]
         public async Task<IActionResult> EditItem(string id, [FromBody]CarouselItemCreateEditModel item)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 await this.homeContent.EditCarouselItem(id, item);
 
                 return this.Ok(new { carouselItemId = id });
-            }
+            });
 
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //try
+            //{
+            //    await this.homeContent.EditCarouselItem(id, item);
+
+            //    return this.Ok(new { carouselItemId = id });
+            //}
+
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         [Authorize]
@@ -129,56 +148,77 @@
         [Route("carousel/items/{id}")]
         public async Task<IActionResult> DeleteItem(string id)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            try
+            return await this.Execute(true, false, async () =>
             {
                 await this.homeContent.DeleteCarouselItem(id);
 
                 return this.Ok(Messages.CarouselItemDeletionConfirmation);
-            }
+            });
 
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //try
+            //{
+            //    await this.homeContent.DeleteCarouselItem(id);
+
+            //    return this.Ok(Messages.CarouselItemDeletionConfirmation);
+            //}
+
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         [HttpGet]
         [Route("carousel/items/{id}")]
         public async Task<IActionResult> GetItem(string id)
         {
-            try
+            return await this.Execute(false, false, async () =>
             {
                 CarouselItemDetailsModel item = await this.homeContent.GetCarouselItem(id);
 
                 return this.Ok(new { carouselItem = item });
-            }
+            });
 
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //try
+            //{
+            //    CarouselItemDetailsModel item = await this.homeContent.GetCarouselItem(id);
+
+            //    return this.Ok(new { carouselItem = item });
+            //}
+
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         [HttpGet]
         [Route("carousel/items")]
         public async Task<IActionResult> GetAllItems()
         {
-            try
+            return await this.Execute(false, false, async () =>
             {
                 IEnumerable<CarouselItemDetailsModel> items = await this.homeContent.GetAllCarouselItems();
 
                 return this.Ok(new { carouselItems = items });
-            }
+            });
 
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //try
+            //{
+            //    IEnumerable<CarouselItemDetailsModel> items = await this.homeContent.GetAllCarouselItems();
+
+            //    return this.Ok(new { carouselItems = items });
+            //}
+
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
     }
 }

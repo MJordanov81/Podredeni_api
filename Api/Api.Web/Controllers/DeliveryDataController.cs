@@ -3,9 +3,7 @@
     using Api.Models.DeliveryData;
     using Api.Services.Interfaces;
     using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using System;
     using System.Threading.Tasks;
 
     [Produces("application/json")]
@@ -24,40 +22,55 @@
         [Route("{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            try
+            return await this.Execute(false, false, async () =>
             {
                 DeliveryDataDetailsModel data = await this.deliveryData.Get(id);
 
                 return this.Ok(new { deliveryData = data });
-            }
+            }); 
 
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //try
+            //{
+            //    DeliveryDataDetailsModel data = await this.deliveryData.Get(id);
+
+            //    return this.Ok(new { deliveryData = data });
+            //}
+
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //post api/deliverydata
         [HttpPost]
         public async Task<IActionResult> CreateDeliveryData([FromBody]DeliveryDataCreateModel data)
         {
-
-            if (!ModelState.IsValid) return this.BadRequest(ModelState);
-
-            try
+            return await this.Execute(false, true, async () =>
             {
                 string deliveryDataId = await this.deliveryData
                     .Create(
                     data);
 
                 return this.Ok(new { deliveryDataId = deliveryDataId });
-            }
+            });
 
-            catch (Exception e)
-            {
+            //if (!ModelState.IsValid) return this.BadRequest(ModelState);
 
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //try
+            //{
+            //    string deliveryDataId = await this.deliveryData
+            //        .Create(
+            //        data);
+
+            //    return this.Ok(new { deliveryDataId = deliveryDataId });
+            //}
+
+            //catch (Exception e)
+            //{
+
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //put api/deliverydata/id
@@ -66,25 +79,32 @@
         [Authorize]
         public async Task<IActionResult> Edit(string id, [FromBody]DeliveryDataCreateModel data)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!ModelState.IsValid) return this.BadRequest(ModelState);
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 await this.deliveryData.Edit(id, data);
 
                 return this.Ok(new { deliveryDataId = id });
-            }
+            });
 
-            catch (Exception e)
-            {
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
 
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //if (!ModelState.IsValid) return this.BadRequest(ModelState);
+
+            //try
+            //{
+            //    await this.deliveryData.Edit(id, data);
+
+            //    return this.Ok(new { deliveryDataId = id });
+            //}
+
+            //catch (Exception e)
+            //{
+
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
 
         }
     }

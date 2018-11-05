@@ -9,10 +9,8 @@
     using Api.Web.Models.Config;
     using Api.Web.Services;
     using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
-    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
@@ -43,12 +41,7 @@
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody]OrderWithoutUserCreateModel order)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
+            return await this.Execute(false, true, async () =>
             {
                 string orderId = await this.orders.Create(order, this.UserId);
 
@@ -59,13 +52,31 @@
                 this.mails.Send(MailConstants.OfficeMail, subject, "", smtpConfiguration);
 
                 return this.Ok(new { orderId = orderId });
-            }
+            });
 
-            catch (Exception e)
-            {
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
 
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //try
+            //{
+            //    string orderId = await this.orders.Create(order, this.UserId);
+
+            //    OrderDetailsModel orderModel = await this.orders.Get(orderId);
+
+            //    string subject = string.Format(MailConstants.SubjectCreate, orderModel.Number);
+
+            //    this.mails.Send(MailConstants.OfficeMail, subject, "", smtpConfiguration);
+
+            //    return this.Ok(new { orderId = orderId });
+            //}
+
+            //catch (Exception e)
+            //{
+
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //put api/orders/id
@@ -74,27 +85,34 @@
         [Authorize]
         public async Task<IActionResult> EditOrder(string id, [FromBody]OrderWithoutUserEditModel order)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 await this.orders.Edit(id, this.UserId, order);
 
                 return this.Ok(new { orderId = id });
-            }
+            });
 
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //try
+            //{
+            //    await this.orders.Edit(id, this.UserId, order);
+
+            //    return this.Ok(new { orderId = id });
+            //}
+
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //get api/orders/id
@@ -103,26 +121,33 @@
         [Authorize]
         public async Task<IActionResult> Get(string id)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 OrderDetailsModel order = await this.orders.Get(id);
 
                 return this.Ok(new { order = order });
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //try
+            //{
+            //    OrderDetailsModel order = await this.orders.Get(id);
+
+            //    return this.Ok(new { order = order });
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //get api/orders/logs/id
@@ -131,26 +156,33 @@
         [Authorize]
         public async Task<IActionResult> GetLog(string id)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
-
-            try
+            return await this.Execute(true, true, async () =>
             {
                 ICollection<OrderLogDetailsModel> list = await logs.GetLog(id);
 
                 return this.Ok(new { logs = list });
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //try
+            //{
+            //    ICollection<OrderLogDetailsModel> list = await logs.GetLog(id);
+
+            //    return this.Ok(new { logs = list });
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
 
         //get api/orders
@@ -158,32 +190,45 @@
         [Authorize]
         public async Task<IActionResult> Get([FromQuery]PaginationModel pagination)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
-
             if (pagination.FilterElement == null) pagination.FilterElement = "";
 
             if (pagination.FilterValue == null) pagination.FilterValue = "";
 
             if (pagination.SortElement == null) pagination.SortElement = "";
 
-            try
+            return await this.Execute(true, true, async () =>
             {
                 OrderDetailsListPaginatedModel result = await orders.GetAll(pagination);
 
                 return this.Ok(result);
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //if (pagination.FilterElement == null) pagination.FilterElement = "";
+
+            //if (pagination.FilterValue == null) pagination.FilterValue = "";
+
+            //if (pagination.SortElement == null) pagination.SortElement = "";
+
+            //try
+            //{
+            //    OrderDetailsListPaginatedModel result = await orders.GetAll(pagination);
+
+            //    return this.Ok(result);
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
 
         }
 
@@ -193,31 +238,50 @@
         [Authorize]
         public async Task<IActionResult> Confirm(string id)
         {
-            if (!this.IsInRole("admin"))
+            return await this.Execute(true, true, async () =>
             {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
+                OrderDetailsModel order = await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Confirmed);
 
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
+                if (!await this.orders.IsConfirmationMailSent(id))
+                {
+                    DeliveryDataDetailsModel deliveryData = await this.deliveryData.Get(order.DeliveryDataId);
 
-            OrderDetailsModel order = await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Confirmed);
+                    string userEmail = deliveryData.Email;
+                    string subject = string.Format(MailConstants.SubjectConfirm, order.Number);
 
-            if (!await this.orders.IsConfirmationMailSent(id))
-            {
-                DeliveryDataDetailsModel deliveryData = await this.deliveryData.Get(order.DeliveryDataId);
+                    this.mails.Send(userEmail, subject, MailConstants.ContentConfirm, this.smtpConfiguration);
 
-                string userEmail = deliveryData.Email;
-                string subject = string.Format(MailConstants.SubjectConfirm, order.Number);
+                    await this.orders.SetConfirmationMailSent(id);
+                }
 
-                this.mails.Send(userEmail, subject, MailConstants.ContentConfirm, this.smtpConfiguration);
+                return this.Ok();
+            });
 
-                await this.orders.SetConfirmationMailSent(id);
-            }
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
 
-            return this.Ok();
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //OrderDetailsModel order = await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Confirmed);
+
+            //if (!await this.orders.IsConfirmationMailSent(id))
+            //{
+            //    DeliveryDataDetailsModel deliveryData = await this.deliveryData.Get(order.DeliveryDataId);
+
+            //    string userEmail = deliveryData.Email;
+            //    string subject = string.Format(MailConstants.SubjectConfirm, order.Number);
+
+            //    this.mails.Send(userEmail, subject, MailConstants.ContentConfirm, this.smtpConfiguration);
+
+            //    await this.orders.SetConfirmationMailSent(id);
+            //}
+
+            //return this.Ok();
         }
 
         //post api/orders/dispatch/id
@@ -226,19 +290,26 @@
         [Authorize]
         public async Task<IActionResult> Dispatch(string id)
         {
-            if (!this.IsInRole("admin"))
+            return await this.Execute(true, true, async () =>
             {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
+                await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Dispatched);
 
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
+                return this.Ok();
+            });
 
-            await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Dispatched);
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
 
-            return this.Ok();
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Dispatched);
+
+            //return this.Ok();
         }
 
         //post api/orders/cancel/id
@@ -247,25 +318,38 @@
         [Authorize]
         public async Task<IActionResult> Cancel(string id)
         {
-            if (!this.IsInRole("admin"))
+            return await this.Execute(true, true, async () =>
             {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
+                OrderDetailsModel order = await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Cancelled);
+                DeliveryDataDetailsModel deliveryData = await this.deliveryData.Get(order.DeliveryDataId);
 
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
+                string userEmail = deliveryData.Email;
+                string subject = string.Format(MailConstants.SubjectCancel, order.Number);
 
-            OrderDetailsModel order = await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Cancelled);
-            DeliveryDataDetailsModel deliveryData = await this.deliveryData.Get(order.DeliveryDataId);
+                this.mails.Send(userEmail, subject, MailConstants.ContentCancel, this.smtpConfiguration);
 
-            string userEmail = deliveryData.Email;
-            string subject = string.Format(MailConstants.SubjectCancel, order.Number);
+                return this.Ok();
+            });
 
-            this.mails.Send(userEmail, subject, MailConstants.ContentCancel, this.smtpConfiguration);
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
 
-            return this.Ok();
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //OrderDetailsModel order = await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Cancelled);
+            //DeliveryDataDetailsModel deliveryData = await this.deliveryData.Get(order.DeliveryDataId);
+
+            //string userEmail = deliveryData.Email;
+            //string subject = string.Format(MailConstants.SubjectCancel, order.Number);
+
+            //this.mails.Send(userEmail, subject, MailConstants.ContentCancel, this.smtpConfiguration);
+
+            //return this.Ok();
         }
 
         //post api/orders/reset/id
@@ -274,19 +358,26 @@
         [Authorize]
         public async Task<IActionResult> ResetStatus(string id)
         {
-            if (!this.IsInRole("admin"))
+            return await this.Execute(true, true, async () =>
             {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
+                await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Ordered);
 
-            if (!this.ModelState.IsValid)
-            {
-                return this.BadRequest(ModelState);
-            }
+                return this.Ok();
+            });
 
-            await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Ordered);
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
 
-            return this.Ok();
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.BadRequest(ModelState);
+            //}
+
+            //await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Ordered);
+
+            //return this.Ok();
         }
     }
 }

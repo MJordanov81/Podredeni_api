@@ -23,23 +23,32 @@
         [Authorize]
         public async Task<IActionResult> Create(string name)
         {
-            if (!this.IsInRole("admin"))
-            {
-                return this.StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
             if (string.IsNullOrWhiteSpace(name)) return BadRequest(ModelConstants.InvalidCategoryName);
 
-            try
+            return await this.Execute(true, false, async () =>
             {
                 string categoryId = await this.categories.Create(name);
 
                 return this.Ok(new { categoryId = categoryId });
-            }
-            catch (Exception e)
-            {
-                return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
+            });
+
+            //if (!this.IsInRole("admin"))
+            //{
+            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
+            //}
+
+            //if (string.IsNullOrWhiteSpace(name)) return BadRequest(ModelConstants.InvalidCategoryName);
+
+            //try
+            //{
+            //    string categoryId = await this.categories.Create(name);
+
+            //    return this.Ok(new { categoryId = categoryId });
+            //}
+            //catch (Exception e)
+            //{
+            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            //}
         }
     }
 }
