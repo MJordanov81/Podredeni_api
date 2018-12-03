@@ -30,27 +30,6 @@
 
                 return this.Ok(new { newsId = newsId });
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(this.ModelState);
-            //}
-
-            //try
-            //{
-            //    string newsId = await this.news.Create(news);
-
-            //    return this.Ok(new { newsId = newsId });
-            //}
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
 
         //put api/news/id
@@ -65,30 +44,6 @@
 
                 return this.Ok(new { newsId = id });
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //try
-            //{
-            //    await this.news.Edit(id, news);
-
-            //    return this.Ok(new { newsId = id });
-            //}
-
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
-
-
         }
 
         //delete api/news/id
@@ -103,23 +58,6 @@
 
                 return this.Ok(Messages.NewsDeletionConfirmation);
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //try
-            //{
-            //    await this.news.Delete(id);
-
-            //    return this.Ok(Messages.NewsDeletionConfirmation);
-            //}
-
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
 
         //get api/news
@@ -132,22 +70,6 @@
 
                 return this.Ok(result);
             });
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //try
-            //{
-            //    NewsListPaginatedModel result = await this.news.GetList(pagination);
-
-            //    return this.Ok(result);
-            //}
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
 
         //get api/news/id
@@ -161,22 +83,6 @@
 
                 return this.Ok(new { news = news });
             });
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //try
-            //{
-            //    NewsDetailsModel news = await this.news.Get(id);
-
-            //    return this.Ok(new { news = news });
-            //}
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
     }
 }

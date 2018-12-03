@@ -3,8 +3,8 @@
     using Api.Models.Cart;
     using Api.Models.Promotion;
     using Api.Services.Interfaces;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     [Produces("application/json")]
@@ -19,15 +19,46 @@
         }
 
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody]PromotionCreateEditModel promotion)
         {
-            //To return admin check!!!
-            return await this.Execute(false, true, async () =>
+            return await this.Execute(true, true, async () =>
             {
                 string promotionId = await this.promotions.Create(promotion);
 
                 return this.Ok(new { promotionId = promotionId });
+            });
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("{id}")]
+        public async Task<IActionResult> Edit(string id, [FromBody]PromotionCreateEditModel promotion)
+        {
+            return await this.Execute(true, true, async () =>
+            {
+                await this.promotions.Edit(id, promotion);
+
+                return this.Ok();
+            });
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> Get(string id)
+        {
+            return await this.Execute(false, false, async () =>
+            {
+                return this.Ok(await this.promotions.Get(id));
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            return await this.Execute(false, false, async () =>
+            {
+                return this.Ok(await this.promotions.Get());
             });
         }
 
@@ -37,9 +68,19 @@
         {
             return await this.Execute(false, true, async () =>
             {
-                CartPromotionResultModel products = await this.promotions.CalculatePromotion(cart);
+                return this.Ok(await this.promotions.ManagePromotion(cart));
+            });
+        }
 
-                return this.Ok(new { products });
+        [HttpDelete]
+        [Authorize]
+        public async Task<IActionResult> Delete(string id)
+        {
+            return await this.Execute(true, false, async () =>
+            {
+                await this.promotions.Delete(id);
+
+                return this.Ok();
             });
         }
     }

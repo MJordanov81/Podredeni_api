@@ -62,5 +62,11 @@
         public const string InvalidPromotionDates = "Start date cannot be later than end date";
 
         public const string InvalidPromotionProductsCount = "Please provide at least one product and one discounted product";
+
+        public const string InvalidPromotionPromoCode = "Promo code already exists in DB, please provide a new one";
+
+        public const string InvalidDeleteRequest = "Cannot delete this promotion because it has been already used";
+
+        public const string InvalidPromotionId = "Promotion with the given id does not exist";
     }
 }

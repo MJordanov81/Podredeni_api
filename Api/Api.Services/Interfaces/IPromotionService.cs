@@ -9,6 +9,14 @@
     {
         Task<string> Create(PromotionCreateEditModel data);
 
-        Task<CartPromotionResultModel> CalculatePromotion(CartPromotionCheckModel data);
+        Task<object> ManagePromotion(CartPromotionCheckModel data);
+
+        Task Delete(string promotionId);
+
+        Task<PromotionDetailsModel> Get(string promotionId);
+
+        Task<ICollection<PromotionDetailsModel>> Get();
+
+        Task Edit(string promotionId, PromotionCreateEditModel data);
     }
 }

@@ -1,9 +1,9 @@
-﻿using Api.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace Api.Data.Configurations
+﻿namespace Api.Data.Configurations
 {
+    using Api.Domain.Entities;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
     public class PromotionConfiguration : IEntityTypeConfiguration<Promotion>
     {
         public void Configure(EntityTypeBuilder<Promotion> builder)
@@ -15,6 +15,8 @@ namespace Api.Data.Configurations
             builder.HasMany(p => p.DiscountedProductsPromotions)
                 .WithOne(dp => dp.Promotion)
                 .HasForeignKey(dp => dp.PromotionId);
+
+            builder.HasAlternateKey(p => p.PromoCode);
         }
     }
 }

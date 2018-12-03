@@ -12,9 +12,10 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181201092432_UpdateNov")]
+    partial class UpdateNov
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -517,8 +518,6 @@ namespace Api.Data.Migrations
                     b.Property<int>("UsedQuota");
 
                     b.HasKey("Id");
-
-                    b.HasAlternateKey("PromoCode");
 
                     b.ToTable("Promotions");
                 });

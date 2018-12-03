@@ -1,11 +1,9 @@
 ﻿namespace Api.Models.PromoDiscount
 {
     using Api.Common.Mapping;
-    using System;
     using Api.Domain.Entities;
-    using AutoMapper;
+    using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     public class PromoDiscountDetailsModel : IMapFrom<PromoDiscount>
     {

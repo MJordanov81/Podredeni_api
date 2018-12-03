@@ -53,30 +53,6 @@
 
                 return this.Ok(new { orderId = orderId });
             });
-
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
-
-            //try
-            //{
-            //    string orderId = await this.orders.Create(order, this.UserId);
-
-            //    OrderDetailsModel orderModel = await this.orders.Get(orderId);
-
-            //    string subject = string.Format(MailConstants.SubjectCreate, orderModel.Number);
-
-            //    this.mails.Send(MailConstants.OfficeMail, subject, "", smtpConfiguration);
-
-            //    return this.Ok(new { orderId = orderId });
-            //}
-
-            //catch (Exception e)
-            //{
-
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
 
         //put api/orders/id
@@ -91,28 +67,6 @@
 
                 return this.Ok(new { orderId = id });
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //try
-            //{
-            //    await this.orders.Edit(id, this.UserId, order);
-
-            //    return this.Ok(new { orderId = id });
-            //}
-
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
 
         //get api/orders/id
@@ -127,27 +81,6 @@
 
                 return this.Ok(new { order = order });
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //try
-            //{
-            //    OrderDetailsModel order = await this.orders.Get(id);
-
-            //    return this.Ok(new { order = order });
-            //}
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
 
         //get api/orders/logs/id
@@ -162,27 +95,6 @@
 
                 return this.Ok(new { logs = list });
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //try
-            //{
-            //    ICollection<OrderLogDetailsModel> list = await logs.GetLog(id);
-
-            //    return this.Ok(new { logs = list });
-            //}
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
 
         //get api/orders
@@ -201,35 +113,7 @@
                 OrderDetailsListPaginatedModel result = await orders.GetAll(pagination);
 
                 return this.Ok(result);
-            });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //if (pagination.FilterElement == null) pagination.FilterElement = "";
-
-            //if (pagination.FilterValue == null) pagination.FilterValue = "";
-
-            //if (pagination.SortElement == null) pagination.SortElement = "";
-
-            //try
-            //{
-            //    OrderDetailsListPaginatedModel result = await orders.GetAll(pagination);
-
-            //    return this.Ok(result);
-            //}
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
-
+            });     
         }
 
         //post api/orders/confirm/id
@@ -256,32 +140,6 @@
 
                 return this.Ok();
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //OrderDetailsModel order = await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Confirmed);
-
-            //if (!await this.orders.IsConfirmationMailSent(id))
-            //{
-            //    DeliveryDataDetailsModel deliveryData = await this.deliveryData.Get(order.DeliveryDataId);
-
-            //    string userEmail = deliveryData.Email;
-            //    string subject = string.Format(MailConstants.SubjectConfirm, order.Number);
-
-            //    this.mails.Send(userEmail, subject, MailConstants.ContentConfirm, this.smtpConfiguration);
-
-            //    await this.orders.SetConfirmationMailSent(id);
-            //}
-
-            //return this.Ok();
         }
 
         //post api/orders/dispatch/id
@@ -296,20 +154,6 @@
 
                 return this.Ok();
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Dispatched);
-
-            //return this.Ok();
         }
 
         //post api/orders/cancel/id
@@ -330,26 +174,6 @@
 
                 return this.Ok();
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //OrderDetailsModel order = await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Cancelled);
-            //DeliveryDataDetailsModel deliveryData = await this.deliveryData.Get(order.DeliveryDataId);
-
-            //string userEmail = deliveryData.Email;
-            //string subject = string.Format(MailConstants.SubjectCancel, order.Number);
-
-            //this.mails.Send(userEmail, subject, MailConstants.ContentCancel, this.smtpConfiguration);
-
-            //return this.Ok();
         }
 
         //post api/orders/reset/id
@@ -364,20 +188,6 @@
 
                 return this.Ok();
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //await this.orders.ChangeStatus(id, this.UserId, Domain.Enums.OrderStatus.Ordered);
-
-            //return this.Ok();
         }
     }
 }
