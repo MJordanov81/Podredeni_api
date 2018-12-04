@@ -19,10 +19,10 @@
         }
 
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Create([FromBody]PromotionCreateEditModel promotion)
         {
-            return await this.Execute(true, true, async () =>
+            return await this.Execute(isAdmin: false, checkState: true, function: async () =>
             {
                 string promotionId = await this.promotions.Create(promotion);
 
@@ -31,11 +31,11 @@
         }
 
         [HttpPut]
-        [Authorize]
+        //[Authorize]
         [Route("{id}")]
         public async Task<IActionResult> Edit(string id, [FromBody]PromotionCreateEditModel promotion)
         {
-            return await this.Execute(true, true, async () =>
+            return await this.Execute(isAdmin: false, checkState: true, function: async () =>
             {
                 await this.promotions.Edit(id, promotion);
 
@@ -47,7 +47,7 @@
         [Route("{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            return await this.Execute(false, false, async () =>
+            return await this.Execute(isAdmin: false, checkState: false, function: async () =>
             {
                 return this.Ok(await this.promotions.Get(id));
             });
@@ -56,7 +56,7 @@
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return await this.Execute(false, false, async () =>
+            return await this.Execute(isAdmin: false, checkState: false, function: async () =>
             {
                 return this.Ok(await this.promotions.Get());
             });
@@ -66,17 +66,17 @@
         [Route("check")]
         public async Task<IActionResult> Check([FromBody]CartPromotionCheckModel cart)
         {
-            return await this.Execute(false, true, async () =>
+            return await this.Execute(isAdmin: false, checkState: true, function: async () =>
             {
-                return this.Ok(await this.promotions.ManagePromotion(cart));
+                return this.Ok(await this.promotions.CalculatePromotion(cart));
             });
         }
 
         [HttpDelete]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Delete(string id)
         {
-            return await this.Execute(true, false, async () =>
+            return await this.Execute(isAdmin: false, checkState: false, function: async () =>
             {
                 await this.promotions.Delete(id);
 

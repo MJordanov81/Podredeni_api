@@ -9,7 +9,7 @@
     {
         Task<string> Create(PromotionCreateEditModel data);
 
-        Task<object> ManagePromotion(CartPromotionCheckModel data);
+        Task<CartPromotionResultModel> CalculatePromotion(CartPromotionCheckModel data);
 
         Task Delete(string promotionId);
 

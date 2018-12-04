@@ -120,32 +120,6 @@
             }
         }
 
-        public async Task<object> ManagePromotion(CartPromotionCheckModel data)
-        {
-            IQueryable<Promotion> promotions = this.db.Promotions.Where(p => p.PromoCode == data.PromoCode);
-
-            string promoId = (await promotions.FirstOrDefaultAsync()).Id;
-
-            int selectableDiscountedProductsCount = promotions
-                .Select(p => p.DiscountedProductsPromotions.Count)
-                .FirstOrDefault();
-
-            int discountedProductsCount = promotions
-                .FirstOrDefault()
-                .DiscountedProductsCount;
-
-            if (selectableDiscountedProductsCount
-                >
-                discountedProductsCount)
-            {
-                return await this.ReturnSelectableDiscountedProducts(promoId);
-            }
-            else
-            {
-                return await this.CalculatePromotion(data);
-            }
-        }
-
         public async Task Delete(string promotionId)
         {
             Promotion promotion = await this.db.Promotions.FirstOrDefaultAsync(p => p.Id == promotionId);
@@ -184,7 +158,9 @@
             promotion.PromoCode = data.PromoCode;
             promotion.IsInclusive = data.IsInclusive;
             promotion.IsAccumulative = data.IsAccumulative;
+            promotion.IncludePriceDiscounts = data.IncludePriceDiscounts;
             promotion.ProductsCount = data.ProductsCount;
+            promotion.DiscountedProductsCount = data.DiscountedProductsCount;
             promotion.Discount = data.Discount;
             promotion.Quota = data.Quota;
 
@@ -231,24 +207,10 @@
             return promotions;
         }
 
-        private async Task<ICollection<ProductDetailsModel>> ReturnSelectableDiscountedProducts(string promoId)
+        public async Task<CartPromotionResultModel> CalculatePromotion(CartPromotionCheckModel data)
         {
-            IList<string> selectableProductsIds = this.db.DiscountedProductsPromotions
-                .Where(p => p.PromotionId == promoId)
-                .Select(p => p.ProductId)
-                .ToList();
-
-            var result = this.db.Products
-                .Where(p => selectableProductsIds.Contains(p.Id))
-                .ProjectTo<ProductDetailsModel>()
-                .ToList();
-
-            return result;
-        }
-
-        private async Task<CartPromotionResultModel> CalculatePromotion(CartPromotionCheckModel data)
-        {
-            Promotion promotion = await this.db.Promotions.FirstOrDefaultAsync(p => p.PromoCode == data.PromoCode);
+            Promotion promotion = await this.db.Promotions
+                .FirstOrDefaultAsync(p => p.PromoCode == data.PromoCode);
 
             if (promotion == null)
             {
@@ -259,8 +221,10 @@
 
             if (!await this.IsWithinQuota(promotion.UsedQuota, promotion.Quota)) throw new ArgumentException("Quota exceeded");
 
+            //The products included in the promotion
             ICollection<string> productsInPromotion = await this.GetProductsInPromotion(data.PromoCode);
 
+            //The number of products in the cart that are included in the promotion
             int productsInPromotionCount = 0;
 
             foreach (ProductInCartModel product in data.Products)
@@ -271,6 +235,7 @@
                 }
             }
 
+            //The ids of products included in the promotion from the cart
             IList<string> productsInPromotionFromCart = data.Products
                 .Select(p => p.Id)
                 .ToList();
@@ -286,12 +251,12 @@
         {
             CartPromotionResultModel result = new CartPromotionResultModel
             {
-                Products = new List<ProductInCartModel>()
+                Cart = new List<ProductInCartModel>()
             };
 
             int quantityToBeGivenAsPromotion = promotion.IsAccumulative
-                ? (productsInPromotionCount / promotion.ProductsCount)
-                : 1;
+                ? (productsInPromotionCount / promotion.ProductsCount) * promotion.DiscountedProductsCount
+                : promotion.DiscountedProductsCount;
 
             bool includePriceDiscounts = promotion.IncludePriceDiscounts;
 
@@ -302,24 +267,58 @@
                 .Select(p => p.ProductId)
                 .ToListAsync();
 
-            foreach (string id in freeProductIds)
+            if (freeProductIds.Count == 1)
             {
-                ProductDetailsModel currentProduct = await this.products.Get(id);
+                string freeProductId = freeProductIds.FirstOrDefault();
 
-                ProductInCartModel promotions = new ProductInCartModel
+                ProductDetailsModel productDetails = await this.products.Get(freeProductId);
+
+                if (includePriceDiscounts) promotionDiscount += productDetails.Discount;
+
+                if (promotionDiscount > 100) promotionDiscount = 100;
+
+                ProductInCartModel freeProduct = new ProductInCartModel
                 {
-                    Id = id,
-                    Name = currentProduct.Name,
-                    ImageUrl = currentProduct.Images.Reverse().FirstOrDefault(),
+                    Id = freeProductId,
+                    Name = productDetails.Name,
+                    ImageUrl = productDetails.Images.Reverse().FirstOrDefault(),
 
                     Quantity = quantityToBeGivenAsPromotion,
-                    Price = currentProduct.Price,
+                    Price = productDetails.Price,
                     Discount = promotionDiscount
                 };
 
-                result.Products.Add(promotions);
+                result.Cart.Add(freeProduct);
+            }
+            else
+            {
+                result.DiscountedProductsCount = quantityToBeGivenAsPromotion;
 
-                await this.db.SaveChangesAsync();
+                result.DiscountedProducts = new List<ProductDetailsModel>();
+
+                foreach (string id in freeProductIds)
+                {
+                    ProductDetailsModel product = await this.products.Get(id);
+
+                    result.DiscountedProducts.Add(product);
+                }
+
+                if (!includePriceDiscounts)
+                {
+                    foreach (ProductDetailsModel product in result.DiscountedProducts)
+                    {
+                        product.Discount = promotion.Discount;
+                    }
+                }
+                else
+                {
+                    foreach (ProductDetailsModel product in result.DiscountedProducts)
+                    {
+                        product.Discount += promotionDiscount;
+
+                        if (product.Discount > 100) product.Discount = 100;
+                    }
+                }
             }
 
             foreach (ProductInCartModel product in data.Products)
@@ -343,8 +342,7 @@
                     Discount = discount
                 };
 
-                result.Products.Add(modifiedProduct);
-
+                result.Cart.Add(modifiedProduct);
             }
 
             return result;
@@ -354,7 +352,7 @@
         {
             CartPromotionResultModel result = new CartPromotionResultModel
             {
-                Products = new List<ProductInCartModel>()
+                Cart = new List<ProductInCartModel>()
             };
 
             int quantityToBeGivenAsPromotion = promotion.IsAccumulative
@@ -367,6 +365,8 @@
 
             decimal promotionDisount = promotion.Discount;
 
+            data.Products = await this.OrderProductsInCart(data.Products, includePriceDiscounts);
+
             foreach (ProductInCartModel product in data.Products)
             {
                 int remainingQuantityToBeGivenAsPromotion = quantityToBeGivenAsPromotion - quantityGivenAsPromotion;
@@ -375,7 +375,9 @@
 
                 if (remainingQuantityToBeGivenAsPromotion > 0 && productsInPromotionFromCart.Contains(product.Id))
                 {
-                    if (!includePriceDiscounts) promotionDisount = 0;
+                    if (includePriceDiscounts) promotionDisount += currentProduct.Discount;
+
+                    if (promotionDisount > 100) promotionDisount = 100;
 
                     if (product.Quantity > remainingQuantityToBeGivenAsPromotion)
                     {
@@ -402,12 +404,12 @@
 
                             Quantity = product.Quantity - remainingQuantityToBeGivenAsPromotion,
                             Price = currentProduct.Price,
-                            Discount = 0
+                            Discount = includePriceDiscounts ? currentProduct.Discount : 0
                         };
 
-                        result.Products.Add(discounted);
+                        result.Cart.Add(discounted);
 
-                        result.Products.Add(productNotDiscounted);
+                        result.Cart.Add(productNotDiscounted);
 
                         quantityGivenAsPromotion += remainingQuantityToBeGivenAsPromotion;
                     }
@@ -427,7 +429,7 @@
                             Discount = promotionDisount
                         };
 
-                        result.Products.Add(discounted);
+                        result.Cart.Add(discounted);
 
                         quantityGivenAsPromotion += product.Quantity;
                     }
@@ -435,22 +437,55 @@
 
                 else
                 {
-                    if (productsInPromotionFromCart.Contains(product.Id) && !includePriceDiscounts)
-                    {
-                        product.Name = currentProduct.Name;
+                    product.Name = currentProduct.Name;
 
-                        product.ImageUrl = currentProduct.Images.Reverse().FirstOrDefault();
+                    product.ImageUrl = currentProduct.Images.Reverse().FirstOrDefault();
 
-                        product.Price = currentProduct.Price;
+                    product.Price = currentProduct.Price;
 
-                        product.Discount = 0;
+                    product.Discount = !includePriceDiscounts && productsInPromotionFromCart.Contains(product.Id) ? 0 : currentProduct.Discount;
 
-                        result.Products.Add(product);
-                    }
+                    result.Cart.Add(product);
                 }
             }
 
             return result;
+        }
+
+        private async Task<ICollection<ProductInCartModel>> OrderProductsInCart(ICollection<ProductInCartModel> products, bool includePriceDiscounts)
+        {
+
+            IEnumerable<string> productsIds = products.Select(p => p.Id);
+
+            var productsWithPrices = productsIds.Select(id =>
+            {
+                ProductDetailsModel product = this.products.Get(id).Result;
+
+                decimal price = includePriceDiscounts ?
+                this.CalculateNetPriceOfAProduct(this.products.Get(id).Result) :
+                this.products.Get(id).Result.Price;
+
+                return new
+                {
+                    id = id,
+                    price = price,
+                };
+            }).ToDictionary(e => e.id, e => e.price);
+
+            foreach (ProductInCartModel product in products)
+            {
+                product.Price = productsWithPrices[product.Id];
+            }
+
+            return products.OrderBy(p => p.Price).ToList();
+        }
+
+        private decimal CalculateNetPriceOfAProduct(ProductDetailsModel product)
+        {
+            decimal price = product.Price;
+            decimal discount = product.Discount;
+
+            return price - (discount / 100) * price;
         }
 
         private async Task<bool> IsPromotionInclusive(string promoCode)

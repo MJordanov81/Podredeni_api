@@ -16,7 +16,7 @@
                 .WithOne(dp => dp.Promotion)
                 .HasForeignKey(dp => dp.PromotionId);
 
-            builder.HasAlternateKey(p => p.PromoCode);
+            builder.HasIndex(p => p.PromoCode).IsUnique();
         }
     }
 }
