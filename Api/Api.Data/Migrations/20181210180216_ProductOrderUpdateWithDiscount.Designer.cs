@@ -12,9 +12,10 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181210180216_ProductOrderUpdateWithDiscount")]
+    partial class ProductOrderUpdateWithDiscount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -424,26 +425,19 @@ namespace Api.Data.Migrations
 
             modelBuilder.Entity("Api.Domain.Entities.ProductOrder", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<string>("ProductId");
+
+                    b.Property<string>("OrderId");
 
                     b.Property<decimal>("Discount");
 
-                    b.Property<string>("OrderId")
-                        .IsRequired();
-
                     b.Property<decimal>("Price");
-
-                    b.Property<string>("ProductId")
-                        .IsRequired();
 
                     b.Property<int>("Quantity");
 
-                    b.HasKey("Id");
+                    b.HasKey("ProductId", "OrderId");
 
                     b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductOrders");
                 });
@@ -483,9 +477,7 @@ namespace Api.Data.Migrations
 
                     b.Property<DateTime>("EndDate");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150);
+                    b.Property<string>("Name");
 
                     b.Property<DateTime>("StartDate");
 
@@ -498,9 +490,6 @@ namespace Api.Data.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000);
 
                     b.Property<decimal>("Discount");
 

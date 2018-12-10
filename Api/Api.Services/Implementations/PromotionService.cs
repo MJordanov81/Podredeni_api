@@ -56,6 +56,7 @@
                 ProductsCount = data.ProductsCount,
                 DiscountedProductsCount = data.DiscountedProductsCount,
                 Discount = data.Discount,
+                Description = data.Description,
                 IncludePriceDiscounts = data.IncludePriceDiscounts,
                 Quota = data.Quota
             };
@@ -162,6 +163,7 @@
             promotion.ProductsCount = data.ProductsCount;
             promotion.DiscountedProductsCount = data.DiscountedProductsCount;
             promotion.Discount = data.Discount;
+            promotion.Description = data.Description;
             promotion.Quota = data.Quota;
 
             await this.db.SaveChangesAsync();
@@ -267,59 +269,60 @@
                 .Select(p => p.ProductId)
                 .ToListAsync();
 
-            if (freeProductIds.Count == 1)
+            //if (freeProductIds.Count == 1)
+            //{
+            //    string freeProductId = freeProductIds.FirstOrDefault();
+
+            //    ProductDetailsModel productDetails = await this.products.Get(freeProductId);
+
+            //    if (includePriceDiscounts) promotionDiscount += productDetails.Discount;
+
+            //    if (promotionDiscount > 100) promotionDiscount = 100;
+
+            //    ProductInCartModel freeProduct = new ProductInCartModel
+            //    {
+            //        Id = freeProductId,
+            //        Name = productDetails.Name,
+            //        ImageUrl = productDetails.Images.Reverse().FirstOrDefault(),
+
+            //        Quantity = quantityToBeGivenAsPromotion,
+            //        Price = productDetails.Price,
+            //        Discount = promotionDiscount
+            //    };
+
+            //    result.Cart.Add(freeProduct);
+            //}
+            //else
+            //{
+
+            result.DiscountedProductsCount = quantityToBeGivenAsPromotion;
+
+            result.DiscountedProducts = new List<ProductDetailsModel>();
+
+            foreach (string id in freeProductIds)
             {
-                string freeProductId = freeProductIds.FirstOrDefault();
+                ProductDetailsModel product = await this.products.Get(id);
 
-                ProductDetailsModel productDetails = await this.products.Get(freeProductId);
+                result.DiscountedProducts.Add(product);
+            }
 
-                if (includePriceDiscounts) promotionDiscount += productDetails.Discount;
-
-                if (promotionDiscount > 100) promotionDiscount = 100;
-
-                ProductInCartModel freeProduct = new ProductInCartModel
+            if (!includePriceDiscounts)
+            {
+                foreach (ProductDetailsModel product in result.DiscountedProducts)
                 {
-                    Id = freeProductId,
-                    Name = productDetails.Name,
-                    ImageUrl = productDetails.Images.Reverse().FirstOrDefault(),
-
-                    Quantity = quantityToBeGivenAsPromotion,
-                    Price = productDetails.Price,
-                    Discount = promotionDiscount
-                };
-
-                result.Cart.Add(freeProduct);
+                    product.Discount = promotion.Discount;
+                }
             }
             else
             {
-                result.DiscountedProductsCount = quantityToBeGivenAsPromotion;
-
-                result.DiscountedProducts = new List<ProductDetailsModel>();
-
-                foreach (string id in freeProductIds)
+                foreach (ProductDetailsModel product in result.DiscountedProducts)
                 {
-                    ProductDetailsModel product = await this.products.Get(id);
+                    product.Discount += promotionDiscount;
 
-                    result.DiscountedProducts.Add(product);
-                }
-
-                if (!includePriceDiscounts)
-                {
-                    foreach (ProductDetailsModel product in result.DiscountedProducts)
-                    {
-                        product.Discount = promotion.Discount;
-                    }
-                }
-                else
-                {
-                    foreach (ProductDetailsModel product in result.DiscountedProducts)
-                    {
-                        product.Discount += promotionDiscount;
-
-                        if (product.Discount > 100) product.Discount = 100;
-                    }
+                    if (product.Discount > 100) product.Discount = 100;
                 }
             }
+            //}
 
             foreach (ProductInCartModel product in data.Products)
             {
@@ -457,7 +460,7 @@
 
             IEnumerable<string> productsIds = products.Select(p => p.Id);
 
-            var productsWithPrices = productsIds.Select(id =>
+            Dictionary<string, decimal> productsWithPrices = productsIds.Select(id =>
             {
                 ProductDetailsModel product = this.products.Get(id).Result;
 

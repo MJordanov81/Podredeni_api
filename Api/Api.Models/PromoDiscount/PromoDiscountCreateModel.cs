@@ -1,16 +1,17 @@
 ﻿namespace Api.Models.PromoDiscount
 {
+    using Api.Models.Infrastructure.Constants;
     using System;
     using System.ComponentModel.DataAnnotations;
 
     public class PromoDiscountCreateModel
     {
         [Required]
-        [Range(0, 100, ErrorMessage = "Discount must be between 0 and 100")]
+        [Range(ModelConstants.PromoDiscountDiscountMinValue, ModelConstants.PromoDiscountDiscountMaxValue, ErrorMessage = ModelConstants.PromoDiscountDiscountError)]
         public decimal Discount { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 100 characters long")]
+        [StringLength(ModelConstants.PromoDiscountNameMaxLenght, MinimumLength = ModelConstants.PromoDiscountNameMinLenght, ErrorMessage = ModelConstants.PromoDiscountNameError)]
         public string Name { get; set; }
 
         public DateTime StartDate { get; set; }

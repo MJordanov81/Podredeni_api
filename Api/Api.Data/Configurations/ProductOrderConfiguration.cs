@@ -8,7 +8,7 @@
     {
         public void Configure(EntityTypeBuilder<ProductOrder> builder)
         {
-            builder.HasKey(po => new { po.ProductId, po.OrderId});
+            //builder.HasKey(po => new { po.ProductId, po.OrderId});
         }
     }
 }

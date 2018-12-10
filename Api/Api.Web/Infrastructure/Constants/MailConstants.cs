@@ -15,5 +15,7 @@
         public const string ContactFormMailContent = "Имейл: {0}" + "\n" + "Име: {1}" + "\n" + "Съдържание: {2}";
 
         public const string OfficeMail = "office@podredeni.eu";
+
+        public const string DebugMail = "marian.jordanov@gmail.com";
     }
 }

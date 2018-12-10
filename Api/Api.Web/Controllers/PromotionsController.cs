@@ -19,7 +19,7 @@
         }
 
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody]PromotionCreateEditModel promotion)
         {
             return await this.Execute(isAdmin: false, checkState: true, function: async () =>
@@ -31,7 +31,7 @@
         }
 
         [HttpPut]
-        //[Authorize]
+        [Authorize]
         [Route("{id}")]
         public async Task<IActionResult> Edit(string id, [FromBody]PromotionCreateEditModel promotion)
         {
@@ -73,7 +73,8 @@
         }
 
         [HttpDelete]
-        //[Authorize]
+        [Authorize]
+        [Route("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             return await this.Execute(isAdmin: false, checkState: false, function: async () =>

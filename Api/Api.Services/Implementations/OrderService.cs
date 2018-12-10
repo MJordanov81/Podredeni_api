@@ -21,7 +21,7 @@
 
         private readonly IOrderLogService logger;
 
-        private readonly INumeratorService numerator;
+        private readonly INumeratorService numerator;      
 
         private string modification;
 
@@ -44,6 +44,11 @@
             if (!this.db.DeliveryData.Any(d => d.Id == data.DeliveryDataId))
             {
                 throw new ArgumentException(ErrorMessages.InvalidOrderId);
+            }
+
+            if (data.PromoCode != null)
+            {
+                await this.UpdatePromotionUsedQuota(data.PromoCode, data.PromotionsCount);
             }
 
             int number = await this.numerator.GetNextNumer(typeof(Order));
@@ -69,6 +74,15 @@
             await this.logger.Log(order.Id, userId, modification);
 
             return orderId;
+        }
+
+        private async Task UpdatePromotionUsedQuota(string promoCode, int promotionsCount)
+        {
+            Promotion promo = await this.db.Promotions.FirstOrDefaultAsync(p => p.PromoCode == promoCode);
+
+            promo.UsedQuota += promotionsCount > 0 ? promotionsCount : 1;
+
+            await this.db.SaveChangesAsync();
         }
 
         public async Task<string> Edit(string orderId, string userId, OrderWithoutUserEditModel data)
@@ -182,13 +196,17 @@
 
             switch (newStatus)
             {
-                case OrderStatus.Confirmed: action = LogConstants.OrderConfirmed;
+                case OrderStatus.Confirmed:
+                    action = LogConstants.OrderConfirmed;
                     break;
-                case OrderStatus.Dispatched: action = LogConstants.OrderDispatched;
+                case OrderStatus.Dispatched:
+                    action = LogConstants.OrderDispatched;
                     break;
-                case OrderStatus.Cancelled: action = LogConstants.OrderCancelled;
+                case OrderStatus.Cancelled:
+                    action = LogConstants.OrderCancelled;
                     break;
-                default: action = LogConstants.OrderReset;
+                default:
+                    action = LogConstants.OrderReset;
                     break;
             }
 
@@ -216,13 +234,14 @@
         private async Task CreateProductOrders(string orderId, ICollection<ProductOrderCreateModel> products)
         {
             foreach (var product in products)
-            {        
+            {
                 ProductOrder po = new ProductOrder
                 {
                     OrderId = orderId,
                     ProductId = product.ProductId,
                     Quantity = product.Quantity,
-                    Price = product.Price
+                    Price = product.Price,
+                    Discount = product.Discount
                 };
 
                 await this.db.ProductOrders.AddAsync(po);
@@ -252,7 +271,7 @@
                 }
             }
 
-            if(sortElement == SortAndFilterConstants.Status)
+            if (sortElement == SortAndFilterConstants.Status)
             {
 
                 if (sortDesc)

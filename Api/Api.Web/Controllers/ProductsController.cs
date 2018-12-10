@@ -5,6 +5,7 @@
     using Api.Services.Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using System;
     using System.Threading.Tasks;
 
     [Produces("application/json")]
@@ -22,6 +23,7 @@
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery]PaginationModel pagination, [FromQuery]bool includeBlocked = false)
         {
+
             if (pagination.FilterElement == null) pagination.FilterElement = "";
 
             if (pagination.FilterValue == null) pagination.FilterValue = "";

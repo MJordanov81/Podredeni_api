@@ -33,6 +33,9 @@
         [Range(0, double.MaxValue)]
         public decimal Discount { get; set; }
 
+        [StringLength(1000)]
+        public string Description { get; set; }
+
         public bool IncludePriceDiscounts { get; set; }
 
         [Range(0, int.MaxValue)]

@@ -15,5 +15,9 @@
 
         [Required]
         public string DeliveryDataId { get; set; }
+
+        public string PromoCode { get; set; }
+
+        public int PromotionsCount { get; set; }
     }
 }

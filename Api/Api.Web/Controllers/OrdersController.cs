@@ -11,6 +11,7 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
@@ -49,7 +50,13 @@
 
                 string subject = string.Format(MailConstants.SubjectCreate, orderModel.Number);
 
-                this.mails.Send(MailConstants.OfficeMail, subject, "", smtpConfiguration);
+                string receiverMail = MailConstants.OfficeMail;
+
+                #if DEBUG
+                    receiverMail= MailConstants.DebugMail;
+                #endif
+
+                this.mails.Send(receiverMail, subject, "", smtpConfiguration);
 
                 return this.Ok(new { orderId = orderId });
             });

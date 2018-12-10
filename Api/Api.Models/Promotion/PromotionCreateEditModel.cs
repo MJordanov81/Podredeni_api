@@ -32,6 +32,9 @@
         [Range(0, double.MaxValue, ErrorMessage = ModelConstants.PromotionDiscountError)]
         public decimal Discount { get; set; }
 
+        [StringLength(ModelConstants.PromotionDescriptionMaxLength, ErrorMessage = ModelConstants.PromotionDescriptionError)]
+        public string Description { get; set; }
+
         public bool IncludePriceDiscounts { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = ModelConstants.PromotionQuotaError)]

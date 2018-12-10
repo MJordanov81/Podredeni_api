@@ -150,6 +150,21 @@
 
         public const string PromotionQuotaError = "Quota must be a positive integer";
 
+        public const int PromotionDescriptionMaxLength = 1000;
+        public const string PromotionDescriptionError = "Promotion description must be less than 1000 characters long";
+
+        #endregion
+
+        #region "PromoDiscount"
+
+        public const int PromoDiscountDiscountMinValue = 0;
+        public const int PromoDiscountDiscountMaxValue = 100;
+        public const string PromoDiscountDiscountError = "Discount must be between 0 and 100";
+
+        public const int PromoDiscountNameMinLenght = 3;
+        public const int PromoDiscountNameMaxLenght = 100;
+        public const string PromoDiscountNameError = "Name must be between 3 and 100 characters long";
+
         #endregion
 
         #region "Video"

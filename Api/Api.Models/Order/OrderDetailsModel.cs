@@ -35,11 +35,13 @@
                 .ForMember(om => om.Products, cfg => cfg.MapFrom(o => o.ProductOrders.Select(po =>
                 new ProductInOrderDetailsModel
                 {
-                    Id = po.ProductId,
+                    Id = po.Id,
+                    ProductOrderId = po.Id,
                     Name = po.Product.Name,
                     Image = po.Product.Images.Select(i => i.Url).FirstOrDefault(),
                     Price = po.Price,
-                    Quantity = po.Quantity
+                    Quantity = po.Quantity,
+                    Discount = po.Discount
                 })));
         }
     }
