@@ -35,7 +35,7 @@
                 .ForMember(om => om.Products, cfg => cfg.MapFrom(o => o.ProductOrders.Select(po =>
                 new ProductInOrderDetailsModel
                 {
-                    Id = po.Id,
+                    Id = po.ProductId,
                     ProductOrderId = po.Id,
                     Name = po.Product.Name,
                     Image = po.Product.Images.Select(i => i.Url).FirstOrDefault(),

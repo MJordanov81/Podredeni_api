@@ -1,5 +1,6 @@
 ﻿namespace Api.Web.Services.Implementations
 {
+    using Api.Web.Models.Config;
     using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
@@ -8,11 +9,25 @@
     {
         private readonly HttpClient client = new HttpClient();
 
-        public async Task<string> GetEkontOfficesXml()
+        public async Task<string> GetEkontOfficesXml(EkontApiConfiguration ekontApiConfiguration)
         {
-            var content = new StringContent("<?xml version=\"1.0\"?><request><client><username>armonik</username><password>18armonik18</password></client><request_type>offices</request_type></request>", Encoding.UTF8, "text/xml");
+            string username = ekontApiConfiguration.Username;
+            string password = ekontApiConfiguration.Password;
+            string url = ekontApiConfiguration.Url;
 
-            var response = await client.PostAsync("https://www.econt.com/e-econt/xml_service_tool.php", content);
+            var content = new StringContent(
+                $"<?xml version=\"1.0\"?>" +
+                $"<request>" +
+                $"<client>" +
+                $"<username>{username}</username>" +
+                $"<password>{password}</password>" +
+                $"</client>" +
+                $"<request_type>" +
+                $"offices" +
+                $"</request_type>" +
+                $"</request>", Encoding.UTF8, "text/xml");
+
+            var response = await client.PostAsync($"{url}", content);
 
             return await response.Content.ReadAsStringAsync();
         }

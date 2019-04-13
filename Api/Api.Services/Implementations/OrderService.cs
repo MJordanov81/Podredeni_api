@@ -21,7 +21,7 @@
 
         private readonly IOrderLogService logger;
 
-        private readonly INumeratorService numerator;      
+        private readonly INumeratorService numerator;
 
         private string modification;
 
@@ -80,9 +80,12 @@
         {
             Promotion promo = await this.db.Promotions.FirstOrDefaultAsync(p => p.PromoCode == promoCode);
 
-            promo.UsedQuota += promotionsCount > 0 ? promotionsCount : 1;
+            if (promo != null)
+            {
+                promo.UsedQuota += promotionsCount > 0 ? promotionsCount : 1;
 
-            await this.db.SaveChangesAsync();
+                await this.db.SaveChangesAsync();
+            }
         }
 
         public async Task<string> Edit(string orderId, string userId, OrderWithoutUserEditModel data)
@@ -238,7 +241,7 @@
                 ProductOrder po = new ProductOrder
                 {
                     OrderId = orderId,
-                    ProductId = product.ProductId,
+                    ProductId = product.Id,
                     Quantity = product.Quantity,
                     Price = product.Price,
                     Discount = product.Discount

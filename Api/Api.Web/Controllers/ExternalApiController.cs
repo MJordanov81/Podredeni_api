@@ -2,8 +2,10 @@
 namespace Api.Web.Controllers
 {
     using Api.Services.Interfaces;
+    using Api.Web.Models.Config;
     using Api.Web.Services;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Options;
     using System.Threading.Tasks;
 
     [Produces("application/json")]
@@ -12,16 +14,21 @@ namespace Api.Web.Controllers
     {
         private readonly IHttpService httpService;
 
-        public  ExternalApiController(IHttpService httpService, IUserService users) : base(users)
+        private readonly EkontApiConfiguration ekontApiConfiguration;
+
+        public ExternalApiController(IHttpService httpService, IOptions<EkontApiConfiguration> ekontApiConfiguration, IUserService users) : base(users)
         {
             this.httpService = httpService;
+            this.ekontApiConfiguration = ekontApiConfiguration.Value;
         }
 
         //get api/externalApi/getEkontOffices
         [Route("getEkontOffices")]
         public async Task<IActionResult> GetEkontOffices()
         {
-            var data = await this.httpService.GetEkontOfficesXml();
+            System.Console.WriteLine();
+
+            var data = await this.httpService.GetEkontOfficesXml(this.ekontApiConfiguration);
 
             return this.Ok(new { offices = data });
         }

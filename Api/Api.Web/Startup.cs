@@ -26,9 +26,11 @@
         {
             services
                 .AddDbContext<ApiDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("RestDefault")));
 
             services.Configure<SmtpConfiguration>(Configuration.GetSection("Smtp"));
+
+            services.Configure<EkontApiConfiguration>(Configuration.GetSection("EkontApiConfiguration"));
 
             //Registers a class JwtConfiguration with properties from appsettings.json section "JwtConfiguration"
             services.AddSingleton(Configuration.GetSection(Infrastructure.Constants.JwtConstants.JwtConfig).Get<JwtConfiguration>());

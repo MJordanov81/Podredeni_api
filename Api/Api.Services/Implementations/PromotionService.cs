@@ -239,6 +239,7 @@
 
             //The ids of products included in the promotion from the cart
             IList<string> productsInPromotionFromCart = data.Products
+                .Where(p => productsInPromotion.Contains(p.Id))
                 .Select(p => p.Id)
                 .ToList();
 
