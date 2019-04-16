@@ -5,11 +5,9 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface ICategoryService
+    public interface ISubcategoryService
     {
         Task<string> Create(string categoryName);
-
-        Task<string> SeedDefaultCategory();
 
         Task<CategoriesDetailsListPaginatedModel> Get(PaginationModel pagination);
 

@@ -35,6 +35,8 @@
 
         public ICollection<CategoryProduct> CategoryProducts { get; set; } = new List<CategoryProduct>();
 
+        public ICollection<SubcategoryProduct> SubcategoryProducts { get; set; } = new List<SubcategoryProduct>();
+
         public ICollection<ProductPromoDiscount> ProductPromoDiscounts { get; set; } = new List<ProductPromoDiscount>();
 
         public ICollection<ProductPromotion> ProductsPromotions { get; set; } = new List<ProductPromotion>();

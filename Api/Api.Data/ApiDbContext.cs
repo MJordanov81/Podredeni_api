@@ -58,6 +58,10 @@
 
         public DbSet<PartnerLocation> PartnerLocations { get; set; }
 
+        public DbSet<Subcategory> Subcategories { get; set; }
+
+        public DbSet<SubcategoryProduct> SubcategoryProducts { get; set; }
+
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -85,6 +89,8 @@
             builder.ApplyConfiguration(new DiscountedProductPromotionConfiguration());
 
             builder.ApplyConfiguration(new PartnerConfiguration());
+
+            builder.ApplyConfiguration(new SubcategoryProductConfiguration());
 
             base.OnModelCreating(builder);
         }

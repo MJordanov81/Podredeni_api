@@ -2,6 +2,7 @@
 {
     using Api.Models.Product;
     using Api.Models.Shared;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     public interface IProductService
@@ -12,6 +13,6 @@
 
         Task<ProductDetailsModel> Get(string id);
 
-        Task<ProductDetailsListPaginatedModel> GetAll(PaginationModel pagination, bool includeBlocked);
+        Task<ProductDetailsListPaginatedModel> GetAll(PaginationModel pagination, ICollection<string> categories, ICollection<string> subcategories, bool includeBlocked);
     }
 }

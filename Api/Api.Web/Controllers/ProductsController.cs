@@ -5,7 +5,7 @@
     using Api.Services.Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     [Produces("application/json")]
@@ -21,8 +21,11 @@
 
         //get api/products
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery]PaginationModel pagination, [FromQuery]bool includeBlocked = false)
+        public async Task<IActionResult> Get([FromQuery]PaginationModel pagination, [FromQuery]string categoriesString, [FromQuery]string subcategoriesString, [FromQuery]bool includeBlocked = false)
         {
+            if (categoriesString == null) categoriesString = "";
+
+            if (subcategoriesString == null) subcategoriesString = "";
 
             if (pagination.FilterElement == null) pagination.FilterElement = "";
 
@@ -30,31 +33,16 @@
 
             if (pagination.SortElement == null) pagination.SortElement = "";
 
+            ICollection<string> categories = categoriesString.Split(new[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries);
+
+            ICollection<string> subcategories = subcategoriesString.Split(new[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries);
+
             return await this.Execute(false, false, async () =>
             {
-                ProductDetailsListPaginatedModel result = await products.GetAll(pagination, includeBlocked);
+                ProductDetailsListPaginatedModel result = await products.GetAll(pagination, categories, subcategories, includeBlocked);
 
                 return this.Ok(result);
             });
-
-
-            //if (pagination.FilterElement == null) pagination.FilterElement = "";
-
-            //if (pagination.FilterValue == null) pagination.FilterValue = "";
-
-            //if (pagination.SortElement == null) pagination.SortElement = "";
-
-            //try
-            //{
-            //    ProductDetailsListPaginatedModel result = await products.GetAll(pagination, includeBlocked);
-
-            //    return this.Ok(result);
-            //}
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
-
         }
 
         //get api/products/{id}
@@ -68,17 +56,6 @@
 
                 return this.Ok(new { product = product });
             });
-
-            //try
-            //{
-            //    ProductDetailsModel product = await this.products.Get(id);
-
-            //    return this.Ok(new { product = product });
-            //}
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
 
         //put api/products/{id}
@@ -94,27 +71,6 @@
 
                 return this.Ok(new { productId = id });
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //try
-            //{
-            //    await this.products.Edit(id, product);
-
-            //    return this.Ok(new { productId = id });
-            //}
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
 
         //post api/products
@@ -128,27 +84,6 @@
 
                 return this.Ok(new { productId = productId });
             });
-
-            //if (!this.IsInRole("admin"))
-            //{
-            //    return this.StatusCode(StatusCodes.Status401Unauthorized);
-            //}
-
-            //if (!ModelState.IsValid)
-            //{
-            //    return this.BadRequest(ModelState);
-            //}
-
-            //try
-            //{
-            //    string productId = await this.products.Create(product);
-
-            //    return this.Ok(new { productId = productId });
-            //}
-            //catch (Exception e)
-            //{
-            //    return this.StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            //}
         }
     }
 }

@@ -18,13 +18,15 @@
         private readonly INumeratorService numerator;
         private readonly IImageService images;
         private readonly ICategoryService categories;
+        private readonly ISubcategoryService subcategories;
         private readonly ApiDbContext db;
 
-        public ProductService(INumeratorService numerator, IImageService images, ICategoryService categories, ApiDbContext db)
+        public ProductService(INumeratorService numerator, IImageService images, ICategoryService categories, ISubcategoryService subcategories, ApiDbContext db)
         {
             this.numerator = numerator;
             this.images = images;
             this.categories = categories;
+            this.subcategories = subcategories;
             this.db = db;
         }
 
@@ -59,6 +61,8 @@
 
             await AddToCategories(data.Categories, product.Id);
 
+            await AddToSubcategories(data.Subcategories, product.Id);
+
             return product.Id;
         }
 
@@ -85,6 +89,8 @@
 
             await UpdateCategories(data.Categories, product.Id);
 
+            await UpdateSubcategories(data.Subcategories, product.Id);
+
             return product.Id;
         }
 
@@ -106,27 +112,47 @@
         }
 
         //Get details for a range of products - filtered, sorted and paginated
-        public async Task<ProductDetailsListPaginatedModel> GetAll(PaginationModel pagination, bool includeBlocked)
+        public async Task<ProductDetailsListPaginatedModel> GetAll(PaginationModel pagination, ICollection<string> categories, ICollection<string> subcategories, bool includeBlocked)
         {
- 
+
             IEnumerable<ProductDetailsModel> products = db.Products
                 .ProjectTo<ProductDetailsModel>()
                 .ToList();
+
+            if (!string.IsNullOrEmpty(pagination.FilterElement))
+            {
+                products = await this.FilterElements(products, pagination.FilterElement, pagination.FilterValue);
+            }
+
+            if (categories != null && categories.Count > 0)
+            {
+                products = await this.FilterCategories(products, categories);
+            }
+
+            if (subcategories != null && subcategories.Count > 0)
+            {
+                products = await this.FilterSubcategories(products, subcategories);
+            }
 
             foreach (var product in products)
             {
                 product.PromoDiscountsIds = await this.GetAssociatedPromoDiscuntsIds(product.Id);
             }
 
+            foreach (var product in products)
+            {
+                product.CategoryIds = await this.GetAssociatedCategoryIds(product.Id);
+            }
+
+            foreach (var product in products)
+            {
+                product.SubcategoryIds = await this.GetAssociatedSubcategoryIds(product.Id);
+            }
+
             foreach (ProductDetailsModel product in products)
             {
                 product.Discount = await this.CalculateDiscount(product.Id);
-   
-            }
 
-            if (!string.IsNullOrEmpty(pagination.FilterElement))
-            {
-                products = await this.FilterElements(products, pagination.FilterElement, pagination.FilterValue);
             }
 
             if (!string.IsNullOrEmpty(pagination.SortElement))
@@ -152,6 +178,22 @@
                 Products = products,
                 ProductsCount = productsCount
             };
+        }
+
+        private async Task<ICollection<string>> GetAssociatedSubcategoryIds(string productId)
+        {
+            return await this.db.SubcategoryProducts
+                .Where(sc => sc.ProductId == productId)
+                .Select(sc => sc.SubcategoryId)
+                .ToListAsync();
+        }
+
+        private async Task<ICollection<string>> GetAssociatedCategoryIds(string productId)
+        {
+            return await this.db.CategoryProducts
+                .Where(cp => cp.ProductId == productId)
+                .Select(cp => cp.CategoryId)
+                .ToListAsync();
         }
 
         private async Task<ICollection<string>> GetAssociatedPromoDiscuntsIds(string productId)
@@ -272,6 +314,36 @@
             return products;
         }
 
+        private async Task<IEnumerable<ProductDetailsModel>> FilterSubcategories(IEnumerable<ProductDetailsModel> products, ICollection<string> subcategories)
+        {
+            ICollection<ProductDetailsModel> result = new List<ProductDetailsModel>();
+
+            foreach (ProductDetailsModel product in products)
+            {
+                if (product.SubcategoryIds != null && product.SubcategoryIds.Any(sc => subcategories.Contains(sc)))
+                {
+                    result.Add(product);
+                }
+            }
+
+            return result;
+        }
+
+        private async Task<IEnumerable<ProductDetailsModel>> FilterCategories(IEnumerable<ProductDetailsModel> products, ICollection<string> categories)
+        {
+            ICollection<ProductDetailsModel> result = new List<ProductDetailsModel>();
+
+            foreach (ProductDetailsModel product in products)
+            {
+                if (product.CategoryIds != null && product.CategoryIds.Any(c => categories.Contains(c)))
+                {
+                    result.Add(product);
+                }
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region "Images"
@@ -342,8 +414,6 @@
 
                 await this.db.SaveChangesAsync();
             }
-
-
         }
 
         private async Task UpdateCategories(ICollection<string> categories, string productId)
@@ -355,6 +425,43 @@
             await this.db.SaveChangesAsync();
 
             await this.AddToCategories(categories, productId);
+        }
+
+        #endregion
+
+        #region "Subcategories"
+
+        private async Task AddToSubcategories(ICollection<string> subcategories, string productId)
+        {
+            if (subcategories != null && subcategories.Count > 0)
+            {
+                string[] subcategoryIds = subcategories.ToArray();
+
+                for (int i = 0; i < subcategoryIds.Length; i++)
+                {
+                    SubcategoryProduct subcategoryProduct = new SubcategoryProduct
+                    {
+                        SubcategoryId = subcategoryIds[i],
+                        ProductId = productId
+
+                    };
+
+                    await this.db.SubcategoryProducts.AddAsync(subcategoryProduct);
+
+                    await this.db.SaveChangesAsync();
+                }
+            }
+        }
+
+        private async Task UpdateSubcategories(ICollection<string> subcategories, string productId)
+        {
+            var subcategoryProducts = this.db.SubcategoryProducts.Where(cp => cp.ProductId == productId).ToList();
+
+            this.db.SubcategoryProducts.RemoveRange(subcategoryProducts);
+
+            await this.db.SaveChangesAsync();
+
+            await this.AddToSubcategories(subcategories, productId);
         }
 
         #endregion

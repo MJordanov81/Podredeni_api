@@ -23,6 +23,8 @@
 
         public ICollection<string> Categories { get; set; }
 
+        public ICollection<string> Subcategories { get; set; }
+
         public bool IsTopSeller { get; set; }
 
         public IList<string> ImageUrls { get; set; }

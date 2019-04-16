@@ -2,9 +2,7 @@
 {
     using Api.Common.Mapping;
     using Api.Domain.Entities;
-    using Api.Models.PromoDiscount;
     using AutoMapper;
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -31,6 +29,10 @@
         public decimal Discount { get; set; }
 
         public ICollection<string> PromoDiscountsIds { get; set; }
+
+        public ICollection<string> CategoryIds { get; set; }
+
+        public ICollection<string> SubcategoryIds { get; set; }
 
         public void ConfigureMapping(Profile mapper)
         {

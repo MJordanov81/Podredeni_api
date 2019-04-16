@@ -41,6 +41,11 @@
         //CATEGORY
         public const string InvalidCategoryName = "Category with the given name already exists";
 
+        public const string InvalidCategoryDelete = "Unable to delete category (already in use?)";
+
+        //SUBCATEGORY
+        public const string InvalidSubcategoryName = "Subcategory with the given name already exists";
+
         //NEWS
         public const string InvalidNewsParameters = "News title, content and/or image url cannot be null or empty";
 

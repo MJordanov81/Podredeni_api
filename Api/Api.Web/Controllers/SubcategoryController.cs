@@ -3,6 +3,7 @@
     using Api.Models.Category;
     using Api.Models.Infrastructure.Constants;
     using Api.Models.Shared;
+    using Api.Models.Subcategory;
     using Api.Services.Interfaces;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
@@ -11,13 +12,13 @@
 
     [Produces("application/json")]
     [Route("api/[controller]")]
-    public class CategoryController : BaseController
+    public class SubcategoryController : BaseController
     {
-        private readonly ICategoryService categories;
+        private readonly ISubcategoryService subcategories;
 
-        public CategoryController(IUserService users, ICategoryService categories) : base(users)
+        public SubcategoryController(IUserService users, ISubcategoryService subcategories) : base(users)
         {
-            this.categories = categories;
+            this.subcategories = subcategories;
         }
 
         [HttpGet]
@@ -26,7 +27,7 @@
         {
             return await this.Execute(false, false, async () =>
             {
-                ICollection<CategoryDetailsModel> categories = await this.categories.GetAll();
+                ICollection<CategoryDetailsModel> categories = await this.subcategories.GetAll();
 
                 return this.Ok(categories);
             });
@@ -43,7 +44,7 @@
 
             return await this.Execute(false, false, async () =>
             {
-                CategoriesDetailsListPaginatedModel categories = await this.categories.Get(pagination);
+                CategoriesDetailsListPaginatedModel categories = await this.subcategories.Get(pagination);
 
                 return this.Ok(categories);
             });
@@ -51,31 +52,31 @@
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Create([FromBody]CategoryCreateModel category)
+        public async Task<IActionResult> Create([FromBody]CategoryCreateModel subcategory)
         {
-            if (string.IsNullOrWhiteSpace(category.Name)) return BadRequest(ModelConstants.InvalidCategoryName);
+            if (string.IsNullOrWhiteSpace(subcategory.Name)) return BadRequest(ModelConstants.InvalidCategoryName);
 
             return await this.Execute(true, false, async () =>
             {
-                string categoryId = await this.categories.Create(category.Name);
+                string subcategoryId = await this.subcategories.Create(subcategory.Name);
 
-                return this.Ok(new { categoryId = categoryId });
+                return this.Ok(new { subcategoryId = subcategoryId });
             });
         }
 
         [HttpPut]
         [Authorize]
         [Route("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody]CategoryCreateModel category)
+        public async Task<IActionResult> Update(string id, [FromBody]CategoryCreateModel subcategory)
         {
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(category.Name))
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(subcategory.Name))
             {
                 return BadRequest(ModelConstants.InvalidCategoryName);
             }
 
             return await this.Execute(true, false, async () =>
             {
-                await this.categories.Update(id, category.Name);
+                await this.subcategories.Update(id, subcategory.Name);
 
                 return this.Ok();
             });
@@ -86,9 +87,6 @@
         [Route("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-
-            var t = this.HttpContext;
-
             if (string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest();
@@ -96,7 +94,7 @@
 
             return await this.Execute(true, false, async () =>
             {
-                await this.categories.Delete(id);
+                await this.subcategories.Delete(id);
 
                 return this.Ok();
             });
