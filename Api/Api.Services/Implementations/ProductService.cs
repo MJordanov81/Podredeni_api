@@ -2,8 +2,10 @@
 {
     using Api.Data;
     using Api.Domain.Entities;
+    using Api.Models.Category;
     using Api.Models.Product;
     using Api.Models.Shared;
+    using Api.Models.Subcategory;
     using AutoMapper.QueryableExtensions;
     using Infrastructure.Constants;
     using Interfaces;
@@ -108,6 +110,10 @@
 
             product.Discount = await this.CalculateDiscount(id);
 
+            product.Categories = await this.GetAssociatedCategoryIds(product.Id);
+
+            product.Subcategories = await this.GetAssociatedSubcategoryIds(product.Id);
+
             return product;
         }
 
@@ -115,7 +121,7 @@
         public async Task<ProductDetailsListPaginatedModel> GetAll(PaginationModel pagination, ICollection<string> categories, ICollection<string> subcategories, bool includeBlocked)
         {
 
-            IEnumerable<ProductDetailsModel> products = db.Products
+            ICollection<ProductDetailsModel> products = db.Products
                 .ProjectTo<ProductDetailsModel>()
                 .ToList();
 
@@ -141,12 +147,12 @@
 
             foreach (var product in products)
             {
-                product.CategoryIds = await this.GetAssociatedCategoryIds(product.Id);
+                product.Categories = await this.GetAssociatedCategoryIds(product.Id);
             }
 
             foreach (var product in products)
             {
-                product.SubcategoryIds = await this.GetAssociatedSubcategoryIds(product.Id);
+                product.Subcategories = await this.GetAssociatedSubcategoryIds(product.Id);
             }
 
             foreach (ProductDetailsModel product in products)
@@ -180,21 +186,26 @@
             };
         }
 
-        private async Task<ICollection<string>> GetAssociatedSubcategoryIds(string productId)
+        private async Task<ICollection<SubcategoryDetailsModel>> GetAssociatedSubcategoryIds(string productId)
         {
-            return await this.db.SubcategoryProducts
+            ICollection<string> subcategoryIds = await this.db.SubcategoryProducts
                 .Where(sc => sc.ProductId == productId)
                 .Select(sc => sc.SubcategoryId)
                 .ToListAsync();
+
+            return await this.db.Subcategories.Where(c => subcategoryIds.Contains(c.Id)).ProjectTo<SubcategoryDetailsModel>().ToListAsync();
         }
 
-        private async Task<ICollection<string>> GetAssociatedCategoryIds(string productId)
+        private async Task<ICollection<CategoryDetailsModel>> GetAssociatedCategoryIds(string productId)
         {
-            return await this.db.CategoryProducts
-                .Where(cp => cp.ProductId == productId)
-                .Select(cp => cp.CategoryId)
-                .ToListAsync();
+            ICollection<string> categoryIds = await this.db.CategoryProducts
+                            .Where(sc => sc.ProductId == productId)
+                            .Select(sc => sc.CategoryId)
+                            .ToListAsync();
+
+            return await this.db.Categories.Where(c => categoryIds.Contains(c.Id)).ProjectTo<CategoryDetailsModel>().ToListAsync();
         }
+    
 
         private async Task<ICollection<string>> GetAssociatedPromoDiscuntsIds(string productId)
         {
@@ -228,7 +239,7 @@
 
         #region "FilterAndSort"
 
-        private async Task<IEnumerable<ProductDetailsModel>> FilterElements(IEnumerable<ProductDetailsModel> products, string filterElement, string filterValue)
+        private async Task<ICollection<ProductDetailsModel>> FilterElements(ICollection<ProductDetailsModel> products, string filterElement, string filterValue)
         {
             if (!string.IsNullOrEmpty(filterValue))
             {
@@ -237,26 +248,48 @@
 
                 if (filterElement == SortAndFilterConstants.Name)
                 {
-                    return products.Where(p => p.Name.ToLower().Contains(filterValue));
+                    return products.Where(p => p.Name.ToLower().Contains(filterValue)).ToList();
+                }
+
+                else if(filterElement == SortAndFilterConstants.Category)
+                {
+                    ICollection<ProductDetailsModel> result = new List<ProductDetailsModel>();
+
+                    foreach (ProductDetailsModel product in products)
+                    {
+                        var categoriesNames =  product.Categories.Select(c => c.Name.ToLower()).ToList();
+
+                        if (categoriesNames.Contains(filterValue))
+                        {
+                            result.Add(product);
+                        }
+                    }
+
+                    return result;
+                }
+
+                else if (filterElement == SortAndFilterConstants.Subcategory)
+                {
+                    return products.Where(p => p.Subcategories.Select(c => c.Name).Contains(filterValue)).ToList();
                 }
 
                 else if (filterElement == SortAndFilterConstants.Number)
                 {
-                    return products.Where(p => p.Number.ToString().Contains(filterValue));
+                    return products.Where(p => p.Number.ToString().Contains(filterValue)).ToList();
                 }
 
                 else if (filterElement == SortAndFilterConstants.Quantity)
                 {
                     bool isANumber = int.TryParse(filterValue, out int quantity);
 
-                    if (isANumber) return products.Where(p => p.Quantity == quantity);
+                    if (isANumber) return products.Where(p => p.Quantity == quantity).ToList();
                 }
 
                 else if (filterElement == SortAndFilterConstants.IsBlocked)
                 {
                     bool isBoolean = bool.TryParse(filterValue, out bool isBlocked);
 
-                    if (isBoolean) return products.Where(p => p.IsBlocked == isBlocked);
+                    if (isBoolean) return products.Where(p => p.IsBlocked == isBlocked).ToList();
                 }
 
 
@@ -264,14 +297,14 @@
                 {
                     bool isBoolean = bool.TryParse(filterValue, out bool isTopSeller);
 
-                    if (isBoolean) return products.Where(p => p.IsTopSeller == isTopSeller);
+                    if (isBoolean) return products.Where(p => p.IsTopSeller == isTopSeller).ToList();
                 }
             }
 
             return products;
         }
 
-        private async Task<IEnumerable<ProductDetailsModel>> SortElements(IEnumerable<ProductDetailsModel> products, string sortElement, bool sortDesc)
+        private async Task<ICollection<ProductDetailsModel>> SortElements(ICollection<ProductDetailsModel> products, string sortElement, bool sortDesc)
         {
             sortElement = sortElement.ToLower();
 
@@ -314,13 +347,13 @@
             return products;
         }
 
-        private async Task<IEnumerable<ProductDetailsModel>> FilterSubcategories(IEnumerable<ProductDetailsModel> products, ICollection<string> subcategories)
+        private async Task<ICollection<ProductDetailsModel>> FilterSubcategories(ICollection<ProductDetailsModel> products, ICollection<string> subcategories)
         {
             ICollection<ProductDetailsModel> result = new List<ProductDetailsModel>();
 
             foreach (ProductDetailsModel product in products)
             {
-                if (product.SubcategoryIds != null && product.SubcategoryIds.Any(sc => subcategories.Contains(sc)))
+                if (product.Subcategories != null && product.Subcategories.Any(sc => subcategories.Contains(sc.Id)))
                 {
                     result.Add(product);
                 }
@@ -329,13 +362,13 @@
             return result;
         }
 
-        private async Task<IEnumerable<ProductDetailsModel>> FilterCategories(IEnumerable<ProductDetailsModel> products, ICollection<string> categories)
+        private async Task<ICollection<ProductDetailsModel>> FilterCategories(ICollection<ProductDetailsModel> products, ICollection<string> categories)
         {
             ICollection<ProductDetailsModel> result = new List<ProductDetailsModel>();
 
             foreach (ProductDetailsModel product in products)
             {
-                if (product.CategoryIds != null && product.CategoryIds.Any(c => categories.Contains(c)))
+                if (product.Categories != null && product.Categories.Any(c => categories.Contains(c.Id)))
                 {
                     result.Add(product);
                 }
@@ -382,7 +415,7 @@
 
         private async Task AddToCategories(ICollection<string> categories, string productId)
         {
-            if (categories != null && categories.Count > 0)
+            if (categories.Count > 0)
             {
                 string[] categoryIds = categories.ToArray();
 

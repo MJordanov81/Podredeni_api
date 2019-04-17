@@ -2,6 +2,8 @@
 {
     using Api.Common.Mapping;
     using Api.Domain.Entities;
+    using Api.Models.Category;
+    using Api.Models.Subcategory;
     using AutoMapper;
     using System.Collections.Generic;
     using System.Linq;
@@ -30,9 +32,9 @@
 
         public ICollection<string> PromoDiscountsIds { get; set; }
 
-        public ICollection<string> CategoryIds { get; set; }
+        public ICollection<CategoryDetailsModel> Categories { get; set; }
 
-        public ICollection<string> SubcategoryIds { get; set; }
+        public ICollection<SubcategoryDetailsModel> Subcategories { get; set; }
 
         public void ConfigureMapping(Profile mapper)
         {

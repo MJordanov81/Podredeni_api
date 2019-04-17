@@ -78,7 +78,7 @@
 
         public async Task<string> SeedDefaultCategory()
         {
-            if (!await this.db.Categories.AnyAsync())
+            if (!await this.db.Categories.AnyAsync(c => c.Name == "Default"))
             {
                 Category defaultCategory = new Category
                 {

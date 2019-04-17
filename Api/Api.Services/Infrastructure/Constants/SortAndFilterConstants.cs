@@ -13,6 +13,10 @@ namespace Api.Services.Infrastructure.Constants
 
         public const string Price = "price";
 
+        public const string Category = "category";
+
+        public const string Subcategory = "subcategory";
+
         public const string IsBlocked = "isblocked";
 
         public const string IsTopSeller = "istopseller";
