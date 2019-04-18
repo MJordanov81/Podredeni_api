@@ -125,21 +125,6 @@
                 .ProjectTo<ProductDetailsModel>()
                 .ToList();
 
-            if (!string.IsNullOrEmpty(pagination.FilterElement))
-            {
-                products = await this.FilterElements(products, pagination.FilterElement, pagination.FilterValue);
-            }
-
-            if (categories != null && categories.Count > 0)
-            {
-                products = await this.FilterCategories(products, categories);
-            }
-
-            if (subcategories != null && subcategories.Count > 0)
-            {
-                products = await this.FilterSubcategories(products, subcategories);
-            }
-
             foreach (var product in products)
             {
                 product.PromoDiscountsIds = await this.GetAssociatedPromoDiscuntsIds(product.Id);
@@ -159,6 +144,21 @@
             {
                 product.Discount = await this.CalculateDiscount(product.Id);
 
+            }
+
+            if (!string.IsNullOrEmpty(pagination.FilterElement))
+            {
+                products = await this.FilterElements(products, pagination.FilterElement, pagination.FilterValue);
+            }
+
+            if (categories != null && categories.Count > 0)
+            {
+                products = await this.FilterCategories(products, categories);
+            }
+
+            if (subcategories != null && subcategories.Count > 0)
+            {
+                products = await this.FilterSubcategories(products, subcategories);
             }
 
             if (!string.IsNullOrEmpty(pagination.SortElement))
@@ -259,9 +259,12 @@
                     {
                         var categoriesNames =  product.Categories.Select(c => c.Name.ToLower()).ToList();
 
-                        if (categoriesNames.Contains(filterValue))
+                        foreach (string categoryName in categoriesNames)
                         {
-                            result.Add(product);
+                            if (categoryName.Contains(filterValue))
+                            {
+                                result.Add(product);
+                            }
                         }
                     }
 
@@ -270,7 +273,22 @@
 
                 else if (filterElement == SortAndFilterConstants.Subcategory)
                 {
-                    return products.Where(p => p.Subcategories.Select(c => c.Name).Contains(filterValue)).ToList();
+                    ICollection<ProductDetailsModel> result = new List<ProductDetailsModel>();
+
+                    foreach (ProductDetailsModel product in products)
+                    {
+                        var subcategoriesNames = product.Subcategories.Select(c => c.Name.ToLower()).ToList();
+
+                        foreach (string subcategoryName in subcategoriesNames)
+                        {
+                            if (subcategoryName.Contains(filterValue))
+                            {
+                                result.Add(product);
+                            }
+                        }
+                    }
+
+                    return result;
                 }
 
                 else if (filterElement == SortAndFilterConstants.Number)
@@ -368,7 +386,7 @@
 
             foreach (ProductDetailsModel product in products)
             {
-                if (product.Categories != null && product.Categories.Any(c => categories.Contains(c.Id)))
+                if (product.Categories != null && product.Categories.Select(c => c.Id).Any(cid => categories.Contains(cid)))
                 {
                     result.Add(product);
                 }
