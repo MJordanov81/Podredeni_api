@@ -62,6 +62,8 @@
 
         public DbSet<SubcategoryProduct> SubcategoryProducts { get; set; }
 
+        public DbSet<Settings> Settings { get; set; }
+
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
