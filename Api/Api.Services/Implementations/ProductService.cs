@@ -179,11 +179,58 @@
 
             products = products.Skip(pagination.Size * (pagination.Page - 1)).Take(pagination.Size).ToList();
 
-            return new ProductDetailsListPaginatedModel
+            ICollection<CategoryDetailsModel> uniqueCategories = await this.PopulateCategories(products);
+
+            ICollection<SubcategoryDetailsModel> uniqueSubategories = await this.PopulateSubcategories(products);
+
+            ProductDetailsListPaginatedModel result = new ProductDetailsListPaginatedModel
             {
                 Products = products,
                 ProductsCount = productsCount
             };
+
+            result.Categories = uniqueCategories;
+            result.Subcategories = uniqueSubategories;
+
+            return result;
+        }
+
+        private async Task<ICollection<CategoryDetailsModel>> PopulateCategories(ICollection<ProductDetailsModel> products)
+        {
+
+            HashSet<CategoryDetailsModel> categories = new HashSet<CategoryDetailsModel>();
+
+            foreach (ProductDetailsModel product in products)
+            {
+                product.Categories.ToList().ForEach(c => {
+                    if(!categories.Select(cc => cc.Id).Contains(c.Id))
+                    {
+                        categories.Add(c);
+                    }
+                });
+            }
+
+            return categories;
+
+        }
+
+        private async Task<ICollection<SubcategoryDetailsModel>> PopulateSubcategories(ICollection<ProductDetailsModel> products)
+        {
+
+            HashSet<SubcategoryDetailsModel> subcategories = new HashSet<SubcategoryDetailsModel>();
+
+            foreach (ProductDetailsModel product in products)
+            {
+                product.Subcategories.ToList().ForEach(c => {
+                    if (!subcategories.Select(cc => cc.Id).Contains(c.Id))
+                    {
+                        subcategories.Add(c);
+                    }
+                });
+            }
+
+            return subcategories;
+
         }
 
         private async Task<ICollection<SubcategoryDetailsModel>> GetAssociatedSubcategoryIds(string productId)
@@ -205,7 +252,7 @@
 
             return await this.db.Categories.Where(c => categoryIds.Contains(c.Id)).ProjectTo<CategoryDetailsModel>().ToListAsync();
         }
-    
+
 
         private async Task<ICollection<string>> GetAssociatedPromoDiscuntsIds(string productId)
         {
@@ -251,13 +298,13 @@
                     return products.Where(p => p.Name.ToLower().Contains(filterValue)).ToList();
                 }
 
-                else if(filterElement == SortAndFilterConstants.Category)
+                else if (filterElement == SortAndFilterConstants.Category)
                 {
                     ICollection<ProductDetailsModel> result = new List<ProductDetailsModel>();
 
                     foreach (ProductDetailsModel product in products)
                     {
-                        var categoriesNames =  product.Categories.Select(c => c.Name.ToLower()).ToList();
+                        var categoriesNames = product.Categories.Select(c => c.Name.ToLower()).ToList();
 
                         foreach (string categoryName in categoriesNames)
                         {
