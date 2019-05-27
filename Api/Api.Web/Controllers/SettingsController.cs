@@ -32,9 +32,6 @@
         [Authorize]
         public async Task<IActionResult> Update([FromBody]SettingsViewEditModel data)
         {
-            var t = "";
-
-
             return await this.Execute(isAdmin: true, checkState: true, function: async () =>
             {
                 await this.settings.Update(data);

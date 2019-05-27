@@ -86,9 +86,6 @@
         [Route("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-
-            var t = this.HttpContext;
-
             if (string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest();
