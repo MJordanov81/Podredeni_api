@@ -22,13 +22,23 @@
 
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery]bool areNested = false)
         {
             return await this.Execute(false, false, async () =>
             {
-                ICollection<CategoryDetailsModel> categories = await this.categories.GetAll();
 
-                return this.Ok(categories);
+                if (!areNested)
+                {
+                    ICollection<CategoryDetailsModel> categories = await this.categories.GetAll();
+
+                    return this.Ok(categories);
+                }
+                else
+                {
+                    ICollection<NestedCategoryDetailsModel> categories = await this.categories.GetAllNested();
+
+                    return this.Ok(categories);
+                }
             });
         }
 
