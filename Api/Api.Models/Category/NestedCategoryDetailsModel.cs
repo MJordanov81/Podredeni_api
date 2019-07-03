@@ -14,7 +14,7 @@
 
         public int Count { get; set; }
 
-        public ICollection<NestedSubcategoryDetailsModel> Subcategories { get; set; }
+        public ICollection<NestedSubcategoryDetailsModel> Subcategories { get; set; } = new List<NestedSubcategoryDetailsModel>();
 
         public void ConfigureMapping(Profile mapper)
         {
