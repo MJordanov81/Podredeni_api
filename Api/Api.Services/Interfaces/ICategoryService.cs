@@ -15,6 +15,8 @@
 
         Task<ICollection<CategoryDetailsModel>> GetAll();
 
+        Task<ICollection<NestedCategoryDetailsModel>> GetAllNested();
+
         Task Update(string categoryId, string name);
 
         Task Delete(string categoryId);
