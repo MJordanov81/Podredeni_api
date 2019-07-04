@@ -187,19 +187,28 @@
                     .CategoryId)
                     .FirstOrDefault();
 
-                category.Count++;
-
-                string scId = product.SubcategoryProducts.FirstOrDefault().SubcategoryId;
-
-
-                if (!category.Subcategories.Any(c => c.Id == scId))
+                if(category == null)
                 {
-                    Subcategory sc = subcategories.FirstOrDefault(c => c.Id == scId);
-
-                    category.Subcategories.Add(new Models.Subcategory.NestedSubcategoryDetailsModel { Id = sc.Id, Name = sc.Name, Count = 0 });
+                    continue;
                 }
 
-                category.Subcategories.FirstOrDefault(sc => sc.Id == scId).Count++;
+                category.Count++;
+
+
+
+                if(product.SubcategoryProducts.Any())
+                {
+                    string scId = product.SubcategoryProducts.FirstOrDefault().SubcategoryId;
+
+                    if (!category.Subcategories.Any(c => c.Id == scId))
+                    {
+                        Subcategory sc = subcategories.FirstOrDefault(c => c.Id == scId);
+
+                        category.Subcategories.Add(new Models.Subcategory.NestedSubcategoryDetailsModel { Id = sc.Id, Name = sc.Name, Count = 0 });
+                    }
+
+                    category.Subcategories.FirstOrDefault(sc => sc.Id == scId).Count++;
+                }
             }
 
             return result;
