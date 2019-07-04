@@ -19,7 +19,7 @@
         private readonly IUserService users;
         private readonly AdminCredentials adminCredentials;
 
-        public AccountController(ITokenService jwtTokenService, ApiDbContext db, IUserService users, AdminCredentials adminCredentials) : base(users)
+        public AccountController(ITokenService jwtTokenService, ApiDbContext db, IUserService users, AdminCredentials adminCredentials, ISettingsService settings) : base(users, settings)
         {
             this.jwtTokenService = jwtTokenService;
             this.db = db;

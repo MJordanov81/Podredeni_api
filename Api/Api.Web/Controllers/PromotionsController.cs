@@ -13,7 +13,7 @@
     {
         private readonly IPromotionService promotions;
 
-        public PromotionsController(IUserService users, IPromotionService promotions) : base(users)
+        public PromotionsController(IUserService users, IPromotionService promotions, ISettingsService settings) : base(users, settings)
         {
             this.promotions = promotions;
         }

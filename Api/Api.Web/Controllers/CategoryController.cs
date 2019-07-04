@@ -15,7 +15,7 @@
     {
         private readonly ICategoryService categories;
 
-        public CategoryController(IUserService users, ICategoryService categories) : base(users)
+        public CategoryController(IUserService users, ICategoryService categories, ISettingsService settings) : base(users, settings)
         {
             this.categories = categories;
         }

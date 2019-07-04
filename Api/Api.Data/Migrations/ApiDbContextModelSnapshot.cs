@@ -557,7 +557,11 @@ namespace Api.Data.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("Name");
+
                     b.Property<bool>("ShowOutOfStock");
+
+                    b.Property<int>("Value");
 
                     b.HasKey("Id");
 

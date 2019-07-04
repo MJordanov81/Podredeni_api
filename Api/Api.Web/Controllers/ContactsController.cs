@@ -18,7 +18,7 @@
 
         private readonly SmtpConfiguration smtpConfiguration;
 
-        public ContactsController(IMailService mails, IOptions<SmtpConfiguration> smtpConfiguration, IUserService users) : base(users)
+        public ContactsController(IMailService mails, IOptions<SmtpConfiguration> smtpConfiguration, IUserService users, ISettingsService settings) : base(users, settings)
         {
             this.mails = mails;
             this.smtpConfiguration = smtpConfiguration.Value;

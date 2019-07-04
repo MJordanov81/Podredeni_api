@@ -16,7 +16,7 @@
     {
         private readonly ISubcategoryService subcategories;
 
-        public SubcategoryController(IUserService users, ISubcategoryService subcategories) : base(users)
+        public SubcategoryController(IUserService users, ISubcategoryService subcategories, ISettingsService settings) : base(users, settings)
         {
             this.subcategories = subcategories;
         }

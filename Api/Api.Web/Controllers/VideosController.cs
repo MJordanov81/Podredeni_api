@@ -13,7 +13,7 @@
     {
         private readonly IVideoService videos;
 
-        public VideosController(IUserService users, IVideoService videos) : base(users)
+        public VideosController(IUserService users, IVideoService videos, ISettingsService settings) : base(users, settings)
         {
             this.videos = videos;
         }

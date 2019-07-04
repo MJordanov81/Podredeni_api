@@ -5,5 +5,9 @@
         public string Id { get; set; }
 
         public bool ShowOutOfStock { get; set; }
+
+        public string Name { get; set; }
+
+        public int Value { get; set; }
     }
 }
