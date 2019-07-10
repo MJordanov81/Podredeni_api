@@ -1,10 +1,9 @@
 ﻿namespace Api.Models.Settings
 {
-    using Api.Common.Mapping;
-    using Api.Domain.Entities;
+    using System.Collections.Generic;
 
-    public class SettingsViewEditModel : IMapFrom<Settings>
+    public class SettingsViewEditModel
     {
-        public bool ShowOutOfStock { get; set; }
+        public IDictionary<string, int> Settings { get; set; }
     }
 }

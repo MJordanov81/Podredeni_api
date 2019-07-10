@@ -12,7 +12,7 @@
     {
         private readonly IDeliveryDataService deliveryData;
 
-        public DeliveryDataController(IDeliveryDataService deliveryData, IUserService users) : base(users)
+        public DeliveryDataController(IDeliveryDataService deliveryData, IUserService users, ISettingsService settings) : base(users, settings)
         {
             this.deliveryData = deliveryData;
         }

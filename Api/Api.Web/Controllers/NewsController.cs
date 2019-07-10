@@ -14,7 +14,7 @@
     {
         private readonly INewsService news;
 
-        public NewsController(INewsService news, IUserService users) : base(users)
+        public NewsController(INewsService news, IUserService users, ISettingsService settings) : base(users, settings)
         {
             this.news = news;
         }

@@ -14,7 +14,7 @@
     {
         private readonly IProductService products;
 
-        public ProductsController(IProductService products, IUserService users) : base(users)
+        public ProductsController(IProductService products, IUserService users, ISettingsService settings) : base(users, settings)
         {
             this.products = products;
         }

@@ -13,7 +13,7 @@
     {
         private readonly IPartnerService partners;
 
-        public PartnersController(IUserService users, IPartnerService partners) : base(users)
+        public PartnersController(IUserService users, IPartnerService partners, ISettingsService settings) : base(users, settings)
         {
             this.partners = partners;
         }

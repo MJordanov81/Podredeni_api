@@ -17,7 +17,7 @@
     {
         private readonly IHomeContentService homeContent;
 
-        public HomeContentController(IUserService users, IHomeContentService homeContent) : base(users)
+        public HomeContentController(IUserService users, IHomeContentService homeContent, ISettingsService settings) : base(users, settings)
         {
             this.homeContent = homeContent;
         }

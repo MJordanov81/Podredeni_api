@@ -14,7 +14,7 @@
     {
         private readonly IPromoDiscountService promoDiscounts;
 
-        public PromoDiscountsController(IUserService users, IPromoDiscountService promoDiscounts) : base(users)
+        public PromoDiscountsController(IUserService users, IPromoDiscountService promoDiscounts, ISettingsService settings) : base(users, settings)
         {
             this.promoDiscounts = promoDiscounts;
         }

@@ -4,10 +4,9 @@
     using Api.Domain.Entities;
     using Api.Models.Settings;
     using Api.Services.Interfaces;
-    using AutoMapper.QueryableExtensions;
     using Microsoft.EntityFrameworkCore;
-    using System;
-    using System.Reflection;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
     public class SettingsService : ISettingsService
@@ -20,37 +19,39 @@
         }
         public async Task<SettingsViewEditModel> Get()
         {
-            if (!await this.db.Settings.AnyAsync())
+            SettingsViewEditModel settings = new SettingsViewEditModel();
+
+            settings.Settings = new Dictionary<string, int>();
+
+            if (this.db.Settings.Any())
             {
-                Settings settings = new Settings();
 
-                await this.db.Settings.AddAsync(settings);
-
-                await this.db.SaveChangesAsync();
+                this.db.Settings
+                    .ToList()
+                    .ForEach(s => settings.Settings.Add(s.Name, s.Value));
+               
             }
 
-            return await this.db.Settings.ProjectTo<SettingsViewEditModel>().FirstOrDefaultAsync();
+            return settings;
         }
 
         public async Task Update(SettingsViewEditModel data)
         {
-            if (!await this.db.Settings.AnyAsync())
+            ICollection<Settings> settings = await this.db.Settings.ToListAsync();
+
+            foreach (var setting in data.Settings)
             {
-                throw new InvalidOperationException();
+                if(!settings.Any(s => s.Name == setting.Key))
+                {
+                   await this.db.AddAsync<Settings>(new Settings { Name = setting.Key, Value = setting.Value });
+                }
+                else
+                {
+                    settings.FirstOrDefault(s => s.Name == setting.Key).Value = setting.Value;
+                }
+
+                await this.db.SaveChangesAsync();
             }
-
-            Settings settings = await this.db.Settings.FirstOrDefaultAsync();
-
-            settings = await this.UpdateModel(data, settings);
-
-            await this.db.SaveChangesAsync();
-        }
-
-        private async Task<Settings> UpdateModel(SettingsViewEditModel settingsNew, Settings settingsOld)
-        {
-            settingsOld.ShowOutOfStock = settingsNew.ShowOutOfStock;
-
-            return settingsOld;
         }
     }
 }

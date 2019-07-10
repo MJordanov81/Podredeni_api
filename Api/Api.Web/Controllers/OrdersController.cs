@@ -29,7 +29,7 @@
 
         private readonly SmtpConfiguration smtpConfiguration;
 
-        public OrdersController(IOrderService orders, IDeliveryDataService deliveryData, IOrderLogService logs, IMailService mails, IOptions<SmtpConfiguration> smtpConfiguration, IUserService users) : base(users)
+        public OrdersController(IOrderService orders, IDeliveryDataService deliveryData, IOrderLogService logs, IMailService mails, IOptions<SmtpConfiguration> smtpConfiguration, IUserService users, ISettingsService settings) : base(users, settings)
         {
             this.orders = orders;
             this.deliveryData = deliveryData;

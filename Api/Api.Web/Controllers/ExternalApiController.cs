@@ -16,7 +16,7 @@ namespace Api.Web.Controllers
 
         private readonly EkontApiConfiguration ekontApiConfiguration;
 
-        public ExternalApiController(IHttpService httpService, IOptions<EkontApiConfiguration> ekontApiConfiguration, IUserService users) : base(users)
+        public ExternalApiController(IHttpService httpService, IOptions<EkontApiConfiguration> ekontApiConfiguration, IUserService users, ISettingsService settings) : base(users, settings)
         {
             this.httpService = httpService;
             this.ekontApiConfiguration = ekontApiConfiguration.Value;
