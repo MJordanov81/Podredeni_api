@@ -10,6 +10,9 @@
         [Range(0, int.MaxValue)]
         public int Number { get; set; }
 
+        [Range(1, int.MaxValue)]
+        public int Order { get; set; }
+
         [Required]
         [StringLength(100)]
         public string Name { get; set; }
@@ -28,6 +31,8 @@
         public bool IsBlocked { get; set; }
 
         public bool IsTopSeller { get; set; }
+
+        public bool IsNewProduct { get; set; }
 
         public ICollection<Image> Images { get; set; } = new List<Image>();
 
