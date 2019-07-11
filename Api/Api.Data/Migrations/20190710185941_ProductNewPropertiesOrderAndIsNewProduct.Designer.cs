@@ -12,9 +12,10 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190710185941_ProductNewPropertiesOrderAndIsNewProduct")]
+    partial class ProductNewPropertiesOrderAndIsNewProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -561,11 +562,7 @@ namespace Api.Data.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Name");
-
                     b.Property<bool>("ShowOutOfStock");
-
-                    b.Property<int>("Value");
 
                     b.HasKey("Id");
 
