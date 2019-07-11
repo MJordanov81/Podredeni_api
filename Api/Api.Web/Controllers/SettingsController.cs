@@ -33,11 +33,9 @@
         //[Authorize]
         public async Task<IActionResult> Update([FromQuery]IDictionary<string, int> data)
         {
-<<<<<<< HEAD
+
             return await this.Execute(isAdmin: false, checkState: false, function: async () =>
-=======
-            return await this.Execute(isAdmin: true, checkState: true, function: async () =>
->>>>>>> 07cbcb3e32b301aafc11cfe9debfe03952fd7b76
+
             {
                 await this.settings.Update(new SettingsViewEditModel() { Settings = data});
 
