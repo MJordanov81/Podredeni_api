@@ -26,6 +26,8 @@
 
         public bool IsTopSeller { get; set; }
 
+        public bool IsNewProduct { get; set; }
+
         public ICollection<string> Images { get; set; }
 
         public decimal Discount { get; set; }

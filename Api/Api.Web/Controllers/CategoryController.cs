@@ -22,7 +22,7 @@
 
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> Get([FromQuery]bool areNested = false)
+        public async Task<IActionResult> Get([FromQuery]int numberOfProducts, [FromQuery]bool areNested = false)
         {
             return await this.Execute(false, false, async () =>
             {
@@ -35,7 +35,7 @@
                 }
                 else
                 {
-                    ICollection<NestedCategoryDetailsModel> categories = await this.categories.GetAllNested();
+                    ICollection<NestedCategoryWithProductsDetailsModel> categories = await this.categories.GetAllNested(numberOfProducts);
 
                     return this.Ok(categories);
                 }
@@ -85,7 +85,62 @@
 
             return await this.Execute(true, false, async () =>
             {
-                await this.categories.Update(id, category.Name);
+                await this.categories.UpdateName(id, category.Name);
+
+                return this.Ok();
+            });
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("{id}")]
+        public async Task<IActionResult> Update(string id, [FromQuery]int newPlace)
+        {
+            if (string.IsNullOrWhiteSpace(id) || newPlace == 0)
+            {
+                return BadRequest(ModelConstants.InvalidCategoryPlace);
+            }
+
+            return await this.Execute(true, false, async () =>
+            {
+                await this.categories.UpdatePlace(id, newPlace);
+
+                return this.Ok();
+            });
+        }
+
+
+        [HttpPut]
+        [Authorize]
+        [Route("reorder/{id}")]
+        public async Task<IActionResult> ReorderProducts(string id, [FromBody]ICollection<string> products, [FromBody]ICollection<int> places)
+        {
+            if (string.IsNullOrWhiteSpace(id) || products.Count < 1 || products.Count != places.Count)
+            {
+                return BadRequest();
+            }
+
+            return await this.Execute(true, false, async () =>
+            {
+                await this.categories.ReorderProducts(id, products, places);
+
+                return this.Ok();
+            });
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("reorder")]
+        public async Task<IActionResult> Reorder([FromBody]ICollection<string> categories, [FromBody]ICollection<int> places)
+        {
+            if (categories.Count < 1 || places.Count != categories.Count)
+            {
+                return BadRequest(ModelConstants.InvalidCategoryPlace);
+            }
+
+            return await this.Execute(true, false, async () =>
+            {
+                await this.categories.Reorder(categories, places);
 
                 return this.Ok();
             });

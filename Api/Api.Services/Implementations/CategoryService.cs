@@ -3,7 +3,9 @@
     using Api.Data;
     using Api.Domain.Entities;
     using Api.Models.Category;
+    using Api.Models.Product;
     using Api.Models.Shared;
+    using Api.Models.Subcategory;
     using Api.Services.Infrastructure.Constants;
     using Api.Services.Interfaces;
     using AutoMapper.QueryableExtensions;
@@ -17,14 +19,17 @@
     {
         private readonly ApiDbContext db;
 
-        public CategoryService(ApiDbContext db)
+        private readonly IProductService products;
+
+        public CategoryService(ApiDbContext db, IProductService products)
         {
             this.db = db;
+            this.products = products;
         }
 
         public async Task<ICollection<CategoryDetailsModel>> GetAll()
         {
-            return this.db.Categories.ProjectTo<CategoryDetailsModel>().ToList();
+            return this.db.Categories.ProjectTo<CategoryDetailsModel>().OrderBy(c => c.Place).ToList();
         }
 
         public async Task<string> Create(string categoryName)
@@ -36,18 +41,20 @@
                 Name = categoryName
             };
 
+            await this.SetInitialPlace(category, true);
+
             await this.db.Categories.AddAsync(category);
 
             await this.db.SaveChangesAsync();
 
             return category.Id;
-
         }
 
         public async Task<CategoriesDetailsListPaginatedModel> Get(PaginationModel pagination)
         {
             IEnumerable<CategoryDetailsModel> categories = await this.db.Categories
                 .ProjectTo<CategoryDetailsModel>()
+                .OrderBy(c => c.Place)
                 .ToListAsync();
 
             if (!string.IsNullOrEmpty(pagination.FilterElement))
@@ -96,7 +103,20 @@
                 .FirstOrDefaultAsync();
         }
 
-        public async Task Update(string categoryId, string categoryName)
+        public async Task UpdatePlace(string categoryId, int newPlace)
+        {
+            Category category = await this.db.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+
+            int currentPlace = category.Place;
+
+            await this.IncrementPlacesStartingAt(currentPlace);
+
+            category.Place = newPlace;
+
+            await this.db.SaveChangesAsync();
+        }
+
+        public async Task UpdateName(string categoryId, string categoryName)
         {
             if (string.IsNullOrWhiteSpace(categoryName))
             {
@@ -138,6 +158,115 @@
             await this.db.SaveChangesAsync();
         }
 
+        public async Task<ICollection<NestedCategoryWithProductsDetailsModel>> GetAllNested(int numberOfProductsPerCategory)
+        {
+            ICollection<NestedCategoryWithProductsDetailsModel> result = this.db.Categories.ProjectTo<NestedCategoryWithProductsDetailsModel>().ToList();
+
+            ICollection<Product> products = this.db.Products.Include(p => p.CategoryProducts).Include(p => p.SubcategoryProducts).ToList();
+
+            ICollection<Subcategory> subcategories = this.db.Subcategories.ToList();
+
+            foreach (Product product in products)
+            {
+                ProductDetailsModel productModel = await this.products.Get(product.Id);
+
+                NestedCategoryWithProductsDetailsModel category = result
+                    .Where(ncdm => ncdm.Id == product.CategoryProducts.FirstOrDefault()
+                    .CategoryId)
+                    .FirstOrDefault();
+
+                if(category == null)
+                {
+                    continue;
+                }
+
+                category.Count++;
+
+                category.Products.Add(productModel);
+
+                if(product.SubcategoryProducts.Any())
+                {
+                    string scId = product.SubcategoryProducts.FirstOrDefault().SubcategoryId;
+
+                    if (!category.Subcategories.Any(c => c.Id == scId))
+                    {
+                        Subcategory sc = subcategories.FirstOrDefault(c => c.Id == scId);
+
+                        category.Subcategories.Add(new Models.Subcategory.NestedSubcategoryDetailsModel { Id = sc.Id, Name = sc.Name, Count = 0 });
+                    }
+
+                    category.Subcategories.FirstOrDefault(sc => sc.Id == scId).Count++;
+                }
+            }
+
+            foreach (var category in result)
+            {
+                await this.AddProducts(category, numberOfProductsPerCategory);
+            }
+
+            return result;
+        }
+
+        private  async Task AddProducts(NestedCategoryWithProductsDetailsModel category, int numberOfProductsPerCategory)
+        {
+            Dictionary<string, int> productPlaces = this.db.CategoryProducts
+                .Where(cp => cp.CategoryId == category.Id)
+                .Select(c => new { c.ProductId, c.Place})
+                .ToDictionary(c => c.ProductId, c => c.Place);
+
+            category.Products = category.Products
+                .Select(cp => 
+                    {
+                        return new { product = cp, place = productPlaces[cp.Id] };
+                    })
+                .OrderBy(p => p.place).Take(numberOfProductsPerCategory)
+                .Select(p => p.product).ToList();
+        }
+
+        public async Task Reorder(ICollection<string> categories, ICollection<int> places)
+        {
+            IDictionary<string, int> categoriesAndPlaces = categories.Zip(places, (k, v) => new { k, v })
+              .ToDictionary(x => x.k, x => x.v);
+
+            foreach (var element in categoriesAndPlaces)
+            {
+                this.db.Categories.FirstOrDefault(c => c.Id == element.Key).Place = element.Value;
+            }
+
+            await this.db.SaveChangesAsync();
+        }
+
+        public async Task ReorderProducts(string categoryId, ICollection<string> products, ICollection<int> places)
+        {
+            IDictionary<string, int> productsAndPlaces = products.Zip(places, (k, v) => new { k, v })
+                .ToDictionary(x => x.k, x => x.v);
+
+            var categoryProducts = this.db.CategoryProducts.Where(cp => cp.CategoryId == categoryId && products.Contains(cp.ProductId));
+
+            await categoryProducts.ForEachAsync(cp => cp.Place = productsAndPlaces[cp.ProductId]);
+
+            await this.db.SaveChangesAsync();
+        }
+
+        private async Task SetInitialPlace(Category category, bool setLast)
+        {
+            if (setLast)
+            {
+                category.Place = this.db.Categories.Count() + 1;
+            }
+
+            await this.IncrementPlacesStartingAt(1);
+
+            category.Place = 1;
+        }
+
+        private async Task IncrementPlacesStartingAt(int fromPlace)
+        {
+            await this.db.Categories.Where(c => c.Place >= fromPlace).ForEachAsync(c => c.Place++);
+
+            await this.db.SaveChangesAsync();
+        }
+
         private async Task<IEnumerable<CategoryDetailsModel>> FilterElements(IEnumerable<CategoryDetailsModel> categories, string filterElement, string filterValue)
         {
             if (!string.IsNullOrEmpty(filterValue))
@@ -172,46 +301,5 @@
             return categories;
         }
 
-        public async Task<ICollection<NestedCategoryDetailsModel>> GetAllNested()
-        {
-            ICollection<NestedCategoryDetailsModel> result = this.db.Categories.ProjectTo<NestedCategoryDetailsModel>().ToList();
-
-            ICollection<Product> products = this.db.Products.Include(p => p.CategoryProducts).Include(p => p.SubcategoryProducts).ToList();
-
-            ICollection<Subcategory> subcategories = this.db.Subcategories.ToList();
-
-            foreach (Product product in products)
-            {
-                NestedCategoryDetailsModel category = result
-                    .Where(ncdm => ncdm.Id == product.CategoryProducts.FirstOrDefault()
-                    .CategoryId)
-                    .FirstOrDefault();
-
-                if(category == null)
-                {
-                    continue;
-                }
-
-                category.Count++;
-
-
-
-                if(product.SubcategoryProducts.Any())
-                {
-                    string scId = product.SubcategoryProducts.FirstOrDefault().SubcategoryId;
-
-                    if (!category.Subcategories.Any(c => c.Id == scId))
-                    {
-                        Subcategory sc = subcategories.FirstOrDefault(c => c.Id == scId);
-
-                        category.Subcategories.Add(new Models.Subcategory.NestedSubcategoryDetailsModel { Id = sc.Id, Name = sc.Name, Count = 0 });
-                    }
-
-                    category.Subcategories.FirstOrDefault(sc => sc.Id == scId).Count++;
-                }
-            }
-
-            return result;
-        }
     }
 }

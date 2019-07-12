@@ -8,7 +8,14 @@
     {
         public void Configure(EntityTypeBuilder<Category> builder)
         {
-            builder.HasMany(c => c.CategoryProducts).WithOne(cp => cp.Category).HasForeignKey(cp => cp.CategoryId);
+            builder
+                .HasMany(c => c.CategoryProducts)
+                .WithOne(cp => cp.Category)
+                .HasForeignKey(cp => cp.CategoryId);
+
+            builder
+                .HasIndex(u => u.Place)
+                .IsUnique();
         }
     }
 }

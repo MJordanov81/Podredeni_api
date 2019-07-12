@@ -94,6 +94,8 @@
 
         public const string InvalidCategoryName = "Name cannot be an empty string";
 
+        public const string InvalidCategoryPlace = "Place must be a number greater or equal to one";
+
         #endregion
 
         #region "News"

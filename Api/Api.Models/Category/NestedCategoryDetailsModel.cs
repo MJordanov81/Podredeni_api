@@ -14,9 +14,11 @@
 
         public int Count { get; set; }
 
+        public int Place { get; set; }
+
         public ICollection<NestedSubcategoryDetailsModel> Subcategories { get; set; } = new List<NestedSubcategoryDetailsModel>();
 
-        public void ConfigureMapping(Profile mapper)
+        public virtual void ConfigureMapping(Profile mapper)
         {
             mapper
                 .CreateMap<Category, NestedCategoryDetailsModel>()

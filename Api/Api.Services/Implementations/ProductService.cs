@@ -21,14 +21,16 @@
         private readonly IImageService images;
         private readonly ICategoryService categories;
         private readonly ISubcategoryService subcategories;
+        private readonly IProductPlacementService placement;
         private readonly ApiDbContext db;
 
-        public ProductService(INumeratorService numerator, IImageService images, ICategoryService categories, ISubcategoryService subcategories, ApiDbContext db)
+        public ProductService(INumeratorService numerator, IImageService images, ICategoryService categories, ISubcategoryService subcategories, IProductPlacementService placement, ApiDbContext db)
         {
             this.numerator = numerator;
             this.images = images;
             this.categories = categories;
             this.subcategories = subcategories;
+            this.placement = placement;
             this.db = db;
         }
 
@@ -45,8 +47,9 @@
                 Description = data.Description,
                 Price = data.Price,
                 IsTopSeller = data.IsTopSeller,
+                IsNewProduct = data.IsNewProduct,
                 Number = number
-            };
+            };         
 
             try
             {
@@ -59,11 +62,13 @@
                 throw new InvalidOperationException(ErrorMessages.UnableToWriteToDb);
             }
 
-            await CreateImages(data.ImageUrls, product.Id);
+            await this.CreateImages(data.ImageUrls, product.Id);
 
-            await AddToCategories(data.Categories, product.Id);
+            await this.AddToCategories(data.Categories, product.Id);
 
-            await AddToSubcategories(data.Subcategories, product.Id);
+            await this.placement.SetInitialPlace(product.Id, data.Categories, true);
+
+            await this.AddToSubcategories(data.Subcategories, product.Id);
 
             return product.Id;
         }
@@ -81,6 +86,7 @@
             product.Description = data.Description;
             product.Price = data.Price;
             product.IsTopSeller = data.IsTopSeller;
+            product.IsNewProduct = data.IsNewProduct;
             product.IsBlocked = data.IsBlocked;
 
             await this.db.SaveChangesAsync();
@@ -117,7 +123,7 @@
             return product;
         }
 
-        //Get details for a range of products - filtered, sorted and paginated
+        //Get details for a range of products - filtered, sorted and paginated 
         public async Task<ProductDetailsListPaginatedModel> GetAll(PaginationModel pagination, ICollection<string> categories, ICollection<string> subcategories, bool includeBlocked)
         {
 
@@ -489,8 +495,8 @@
                     CategoryProduct categoryProduct = new CategoryProduct
                     {
                         CategoryId = categoryIds[i],
-                        ProductId = productId
-
+                        ProductId = productId,
+                        Place = 0
                     };
 
                     await this.db.CategoryProducts.AddAsync(categoryProduct);

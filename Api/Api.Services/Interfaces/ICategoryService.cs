@@ -15,9 +15,15 @@
 
         Task<ICollection<CategoryDetailsModel>> GetAll();
 
-        Task<ICollection<NestedCategoryDetailsModel>> GetAllNested();
+        Task<ICollection<NestedCategoryWithProductsDetailsModel>> GetAllNested(int numberOfProductsPerCategory);
 
-        Task Update(string categoryId, string name);
+        Task UpdateName(string categoryId, string name);
+
+        Task UpdatePlace(string categoryId, int place);
+
+        Task Reorder(ICollection<string> categories, ICollection<int> places);
+
+        Task ReorderProducts(string categoryId, ICollection<string> products, ICollection<int> places);
 
         Task Delete(string categoryId);
     }

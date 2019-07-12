@@ -1,4 +1,6 @@
-﻿namespace Api.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Api.Domain.Entities
 {
     public class CategoryProduct
     {
@@ -9,5 +11,8 @@
         public string ProductId { get; set; }
 
         public Product Product { get; set; }
+
+        [Range(0, int.MaxValue)]
+        public int Place { get; set; }
     }
 }

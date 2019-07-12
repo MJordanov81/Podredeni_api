@@ -25,6 +25,8 @@
 
         public ICollection<string> Subcategories { get; set; }
 
+        public bool IsNewProduct { get; set; }
+
         public bool IsTopSeller { get; set; }
 
         public IList<string> ImageUrls { get; set; }

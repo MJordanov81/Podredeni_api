@@ -11,7 +11,7 @@
         public int Number { get; set; }
 
         [Range(1, int.MaxValue)]
-        public int Order { get; set; }
+        public int Place { get; set; }
 
         [Required]
         [StringLength(100)]
