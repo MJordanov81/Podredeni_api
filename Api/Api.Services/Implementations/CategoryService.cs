@@ -83,26 +83,6 @@
 
         }
 
-        public async Task<string> SeedDefaultCategory()
-        {
-            if (!await this.db.Categories.AnyAsync(c => c.Name == "Default"))
-            {
-                Category defaultCategory = new Category
-                {
-                    Name = "Default"
-                };
-
-                await this.db.Categories.AddAsync(defaultCategory);
-
-                await this.db.SaveChangesAsync();
-            }
-
-            return await this.db.Categories
-                .Where(c => c.Name == "Default")
-                .Select(c => c.Id)
-                .FirstOrDefaultAsync();
-        }
-
         public async Task UpdatePlace(string categoryId, int newPlace)
         {
             Category category = await this.db.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
@@ -158,9 +138,12 @@
             await this.db.SaveChangesAsync();
         }
 
-        public async Task<ICollection<NestedCategoryWithProductsDetailsModel>> GetAllNested(int numberOfProductsPerCategory)
+        public async Task<ICollection<NestedCategoryWithProductsDetailsModel>> GetAllNested(int numberOfProductsPerCategory = 3)
         {
-            ICollection<NestedCategoryWithProductsDetailsModel> result = this.db.Categories.ProjectTo<NestedCategoryWithProductsDetailsModel>().ToList();
+            ICollection<NestedCategoryWithProductsDetailsModel> result = this.db.Categories
+                .ProjectTo<NestedCategoryWithProductsDetailsModel>()
+                .OrderBy(c => c.Place)
+                .ToList();
 
             ICollection<Product> products = this.db.Products.Include(p => p.CategoryProducts).Include(p => p.SubcategoryProducts).ToList();
 
@@ -209,6 +192,8 @@
 
         private  async Task AddProducts(NestedCategoryWithProductsDetailsModel category, int numberOfProductsPerCategory)
         {
+            numberOfProductsPerCategory = 3;
+
             Dictionary<string, int> productPlaces = this.db.CategoryProducts
                 .Where(cp => cp.CategoryId == category.Id)
                 .Select(c => new { c.ProductId, c.Place})

@@ -9,8 +9,6 @@
     {
         Task<string> Create(string categoryName);
 
-        Task<string> SeedDefaultCategory();
-
         Task<CategoriesDetailsListPaginatedModel> Get(PaginationModel pagination);
 
         Task<ICollection<CategoryDetailsModel>> GetAll();

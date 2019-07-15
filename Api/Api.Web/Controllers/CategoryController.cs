@@ -74,10 +74,14 @@
         }
 
         [HttpPut]
-        [Authorize]
+        //[Authorize]
         [Route("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody]CategoryCreateModel category)
         {
+            var s = "";
+
+            System.Console.WriteLine(s);
+
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(category.Name))
             {
                 return BadRequest(ModelConstants.InvalidCategoryName);
@@ -93,7 +97,7 @@
 
         [HttpPut]
         [Authorize]
-        [Route("{id}")]
+        [Route("place/{id}")]
         public async Task<IActionResult> Update(string id, [FromQuery]int newPlace)
         {
             if (string.IsNullOrWhiteSpace(id) || newPlace == 0)
@@ -129,16 +133,22 @@
         }
 
         [HttpPut]
-        [Authorize]
+        //[Authorize]
         [Route("reorder")]
-        public async Task<IActionResult> Reorder([FromBody]ICollection<string> categories, [FromBody]ICollection<int> places)
+        public async Task<IActionResult> Reorder([FromBody]ICollection<string> categories, [FromBody]ICollection<int> places, [FromQuery]string test)
         {
+
+            if(categories == null || places == null)
+            {
+                return BadRequest(ModelConstants.InvalidCategoryPlace);
+            }
+
             if (categories.Count < 1 || places.Count != categories.Count)
             {
                 return BadRequest(ModelConstants.InvalidCategoryPlace);
             }
 
-            return await this.Execute(true, false, async () =>
+            return await this.Execute(false, false, async () =>
             {
                 await this.categories.Reorder(categories, places);
 

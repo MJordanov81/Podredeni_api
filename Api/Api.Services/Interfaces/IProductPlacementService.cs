@@ -7,6 +7,6 @@
     {
         Task SetInitialPlace(string productId, ICollection<string> categories, bool isFirstProduct);
 
-        Task ChangePlace(string productId, string categoryId, int newPlace)
+        Task ChangePlace(string productId, string categoryId, int newPlace);
     }
 }

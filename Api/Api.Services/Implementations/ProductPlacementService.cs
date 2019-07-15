@@ -10,11 +10,11 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    class ProductPlacementByCategoryService : IProductPlacementService
+    class ProductPlacementService : IProductPlacementService
     {
         private readonly ApiDbContext db;
 
-        public ProductPlacementByCategoryService(ApiDbContext db)
+        public ProductPlacementService(ApiDbContext db)
         {
             this.db = db;
         }

@@ -19,17 +19,14 @@
     {
         private readonly INumeratorService numerator;
         private readonly IImageService images;
-        private readonly ICategoryService categories;
         private readonly ISubcategoryService subcategories;
         private readonly IProductPlacementService placement;
         private readonly ApiDbContext db;
 
-        public ProductService(INumeratorService numerator, IImageService images, ICategoryService categories, ISubcategoryService subcategories, IProductPlacementService placement, ApiDbContext db)
+        public ProductService(INumeratorService numerator, IImageService images, ISubcategoryService subcategories, IProductPlacementService placement, ApiDbContext db)
         {
             this.numerator = numerator;
             this.images = images;
-            this.categories = categories;
-            this.subcategories = subcategories;
             this.placement = placement;
             this.db = db;
         }
@@ -506,7 +503,7 @@
             }
             else
             {
-                string defaultCategoryId = await this.categories.SeedDefaultCategory();
+                string defaultCategoryId = await this.SeedDefaultCategory();
 
                 CategoryProduct categoryProduct = new CategoryProduct
                 {
@@ -518,6 +515,26 @@
 
                 await this.db.SaveChangesAsync();
             }
+        }
+
+        private async Task<string> SeedDefaultCategory()
+        {
+            if (!await this.db.Categories.AnyAsync(c => c.Name == "Default"))
+            {
+                Category defaultCategory = new Category
+                {
+                    Name = "Default"
+                };
+
+                await this.db.Categories.AddAsync(defaultCategory);
+
+                await this.db.SaveChangesAsync();
+            }
+
+            return await this.db.Categories
+                .Where(c => c.Name == "Default")
+                .Select(c => c.Id)
+                .FirstOrDefaultAsync();
         }
 
         private async Task UpdateCategories(ICollection<string> categories, string productId)

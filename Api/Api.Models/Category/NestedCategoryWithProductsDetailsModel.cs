@@ -7,7 +7,7 @@
 
     public class NestedCategoryWithProductsDetailsModel : NestedCategoryDetailsModel
     {
-        public ICollection<ProductDetailsModel> Products { get; set; }
+        public ICollection<ProductDetailsModel> Products { get; set; } = new List<ProductDetailsModel>();
 
         public override void ConfigureMapping(Profile mapper)
         {

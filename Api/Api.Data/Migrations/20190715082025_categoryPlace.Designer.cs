@@ -12,9 +12,10 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190715082025_categoryPlace")]
+    partial class categoryPlace
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -422,6 +423,8 @@ namespace Api.Data.Migrations
                         .HasMaxLength(100);
 
                     b.Property<int>("Number");
+
+                    b.Property<int>("Place");
 
                     b.Property<decimal>("Price");
 

@@ -10,9 +10,6 @@
         [Range(0, int.MaxValue)]
         public int Number { get; set; }
 
-        [Range(1, int.MaxValue)]
-        public int Place { get; set; }
-
         [Required]
         [StringLength(100)]
         public string Name { get; set; }
