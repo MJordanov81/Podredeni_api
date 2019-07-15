@@ -12,9 +12,10 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190715194115_uniqueUpdate")]
+    partial class uniqueUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,6 +52,9 @@ namespace Api.Data.Migrations
                     b.Property<int>("Place");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Place")
+                        .IsUnique();
 
                     b.ToTable("Categories");
                 });

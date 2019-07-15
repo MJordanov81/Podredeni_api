@@ -13,9 +13,9 @@
                 .WithOne(cp => cp.Category)
                 .HasForeignKey(cp => cp.CategoryId);
 
-            builder
-                .HasIndex(u => u.Place)
-                .IsUnique();
+            //builder
+            //    .HasIndex(u => u.Place)
+            //    .IsUnique();
         }
     }
 }

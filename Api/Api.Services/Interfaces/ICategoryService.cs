@@ -21,8 +21,10 @@
 
         Task Reorder(ICollection<string> categories, ICollection<int> places);
 
-        Task ReorderProducts(string categoryId, ICollection<string> products, ICollection<int> places);
+        Task ReorderProducts(string categoryId, ICollection<string> products);
 
         Task Delete(string categoryId);
+
+        void CheckCategoryOrderAndInsertPlaces();
     }
 }

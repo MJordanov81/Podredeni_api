@@ -53,8 +53,8 @@ namespace Api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Place")
-                        .IsUnique();
+                    //b.HasIndex("Place")
+                    //    .IsUnique();
 
                     b.ToTable("Categories");
                 });
@@ -69,8 +69,8 @@ namespace Api.Data.Migrations
 
                     b.HasKey("CategoryId", "ProductId");
 
-                    b.HasIndex("Place")
-                        .IsUnique();
+                    //b.HasIndex("Place")
+                    //    .IsUnique();
 
                     b.HasIndex("ProductId");
 

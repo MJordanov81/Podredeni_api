@@ -4,24 +4,10 @@ using System.Collections.Generic;
 
 namespace Api.Data.Migrations
 {
-    public partial class categoryPlace : Migration
+    public partial class placeUnique : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "Place",
-                table: "CategoryProducts",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
-
-            migrationBuilder.AddColumn<int>(
-                name: "Place",
-                table: "Categories",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
-
             //migrationBuilder.CreateIndex(
             //    name: "IX_CategoryProducts_Place",
             //    table: "CategoryProducts",
@@ -44,14 +30,6 @@ namespace Api.Data.Migrations
             //migrationBuilder.DropIndex(
             //    name: "IX_Categories_Place",
             //    table: "Categories");
-
-            migrationBuilder.DropColumn(
-                name: "Place",
-                table: "CategoryProducts");
-
-            migrationBuilder.DropColumn(
-                name: "Place",
-                table: "Categories");
         }
     }
 }

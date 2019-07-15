@@ -74,7 +74,7 @@
         }
 
         [HttpPut]
-        //[Authorize]
+        [Authorize]
         [Route("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody]CategoryCreateModel category)
         {
@@ -117,38 +117,45 @@
         [HttpPut]
         [Authorize]
         [Route("reorder/{id}")]
-        public async Task<IActionResult> ReorderProducts(string id, [FromBody]ICollection<string> products, [FromBody]ICollection<int> places)
+        public async Task<IActionResult> ReorderProducts(string id, [FromBody]ProductsReorderModel data)
         {
-            if (string.IsNullOrWhiteSpace(id) || products.Count < 1 || products.Count != places.Count)
+            if (string.IsNullOrWhiteSpace(id) || data.Products.Count < 1)
             {
                 return BadRequest();
             }
 
             return await this.Execute(true, false, async () =>
             {
-                await this.categories.ReorderProducts(id, products, places);
+                await this.categories.ReorderProducts(id, data.Products);
 
                 return this.Ok();
             });
         }
 
         [HttpPut]
-        //[Authorize]
+        [Authorize]
         [Route("reorder")]
-        public async Task<IActionResult> Reorder([FromBody]ICollection<string> categories, [FromBody]ICollection<int> places, [FromQuery]string test)
+        public async Task<IActionResult> Reorder([FromBody]ICollection<string> categories)
         {
 
-            if(categories == null || places == null)
+            if(categories == null)
             {
                 return BadRequest(ModelConstants.InvalidCategoryPlace);
             }
 
-            if (categories.Count < 1 || places.Count != categories.Count)
+            if (categories.Count < 1)
             {
                 return BadRequest(ModelConstants.InvalidCategoryPlace);
             }
 
-            return await this.Execute(false, false, async () =>
+            ICollection<int> places = new List<int>();
+
+            for (int i = 0; i < categories.Count; i++)
+            {
+                places.Add(i + 1);
+            }
+
+            return await this.Execute(true, false, async () =>
             {
                 await this.categories.Reorder(categories, places);
 

@@ -14,5 +14,7 @@
         Task<ProductDetailsModel> Get(string id);
 
         Task<ProductDetailsListPaginatedModel> GetAll(PaginationModel pagination, ICollection<string> categories, ICollection<string> subcategories, bool includeBlocked);
+
+        void CheckProductPlacesAndUpdate();
     }
 }

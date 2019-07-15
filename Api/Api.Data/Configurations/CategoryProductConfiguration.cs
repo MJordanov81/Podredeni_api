@@ -9,8 +9,6 @@
         public void Configure(EntityTypeBuilder<CategoryProduct> builder)
         {
             builder.HasKey(cp => new { cp.CategoryId, cp.ProductId });
-
-            builder.HasIndex(c => c.Place).IsUnique();
         }
     }
 }

@@ -221,16 +221,35 @@
             await this.db.SaveChangesAsync();
         }
 
-        public async Task ReorderProducts(string categoryId, ICollection<string> products, ICollection<int> places)
+        public async Task ReorderProducts(string categoryId, ICollection<string> products)
         {
-            IDictionary<string, int> productsAndPlaces = products.Zip(places, (k, v) => new { k, v })
-                .ToDictionary(x => x.k, x => x.v);
+            var categoryProducts = this.db.CategoryProducts.Where(cp => cp.CategoryId == categoryId).ToList();
 
-            var categoryProducts = this.db.CategoryProducts.Where(cp => cp.CategoryId == categoryId && products.Contains(cp.ProductId));
+            List<string> productIds = products as List<string>;
 
-            await categoryProducts.ForEachAsync(cp => cp.Place = productsAndPlaces[cp.ProductId]);
+            for (int i = 0; i < categoryProducts.Count; i++)
+            {
+                categoryProducts[i].Place = productIds.IndexOf(categoryProducts[i].ProductId) + 1;
+            }
 
             await this.db.SaveChangesAsync();
+        }
+
+        public void CheckCategoryOrderAndInsertPlaces()
+        {
+            var categories = this.db.Categories.ToList();
+
+            if(categories.GroupBy(c => c.Place).Any(g => g.Count() > 1))
+            {
+                var place = 1;
+
+                foreach (var category in categories.Where(c => c.Name != "Default"))
+                {
+                    category.Place = place++;
+                }
+
+                this.db.SaveChanges();
+            }
         }
 
         private async Task SetInitialPlace(Category category, bool setLast)

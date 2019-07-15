@@ -18,13 +18,17 @@
         private readonly ApiDbContext db;
         private readonly IUserService users;
         private readonly AdminCredentials adminCredentials;
+        private readonly IProductService products;
+        private readonly ICategoryService categories;
 
-        public AccountController(ITokenService jwtTokenService, ApiDbContext db, IUserService users, AdminCredentials adminCredentials, ISettingsService settings) : base(users, settings)
+        public AccountController(ITokenService jwtTokenService, ApiDbContext db, IUserService users, AdminCredentials adminCredentials, ISettingsService settings, IProductService products, ICategoryService categories) : base(users, settings)
         {
             this.jwtTokenService = jwtTokenService;
             this.db = db;
             this.users = users;
             this.adminCredentials = adminCredentials;
+            this.products = products;
+            this.categories = categories;
         }
 
         //get api/
@@ -32,6 +36,10 @@
         [Route("api/")]
         public async Task<IActionResult> Hello()
         {
+            //this.products.CheckProductPlacesAndUpdate();
+
+            //this.categories.CheckCategoryOrderAndInsertPlaces();
+
             return this.Ok("Hello from Api");
         }
 

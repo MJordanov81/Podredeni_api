@@ -46,7 +46,7 @@
                 IsTopSeller = data.IsTopSeller,
                 IsNewProduct = data.IsNewProduct,
                 Number = number
-            };         
+            };
 
             try
             {
@@ -205,8 +205,9 @@
 
             foreach (ProductDetailsModel product in products)
             {
-                product.Categories.ToList().ForEach(c => {
-                    if(!categories.Select(cc => cc.Id).Contains(c.Id))
+                product.Categories.ToList().ForEach(c =>
+                {
+                    if (!categories.Select(cc => cc.Id).Contains(c.Id))
                     {
                         categories.Add(c);
                     }
@@ -224,7 +225,8 @@
 
             foreach (ProductDetailsModel product in products)
             {
-                product.Subcategories.ToList().ForEach(c => {
+                product.Subcategories.ToList().ForEach(c =>
+                {
                     if (!subcategories.Select(cc => cc.Id).Contains(c.Id))
                     {
                         subcategories.Add(c);
@@ -482,7 +484,7 @@
         #region "Categories"
 
         private async Task AddToCategories(ICollection<string> categories, string productId)
-        {
+        {         
             if (categories.Count > 0)
             {
                 string[] categoryIds = categories.ToArray();
@@ -514,6 +516,41 @@
                 await this.db.CategoryProducts.AddAsync(categoryProduct);
 
                 await this.db.SaveChangesAsync();
+            }
+        }
+
+        public void CheckProductPlacesAndUpdate()
+        {
+            var categoryProducts = this.db.CategoryProducts.OrderBy(c => c.CategoryId).ThenBy(c => c.Place).ToList();
+
+            var place = 0;
+            var categoryId = categoryProducts.First().CategoryId;
+
+            foreach (var item in categoryProducts)
+            {
+                if (true)
+                {
+                    foreach (var categoryProduct in categoryProducts)
+                    {
+                        if(categoryProduct.CategoryId == categoryId)
+                        {
+                            categoryProduct.Place = ++place;
+                        }
+                        else
+                        {
+                            categoryProduct.Place = 1;
+                            place = 1;
+                        }
+
+                        categoryId = categoryProduct.CategoryId;
+
+                    }
+
+
+                    this.db.SaveChanges();
+
+                    return;
+                }
             }
         }
 
