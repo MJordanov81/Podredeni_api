@@ -138,7 +138,7 @@
             await this.db.SaveChangesAsync();
         }
 
-        public async Task<ICollection<NestedCategoryWithProductsDetailsModel>> GetAllNested(int numberOfProductsPerCategory = 3)
+        public async Task<ICollection<NestedCategoryWithProductsDetailsModel>> GetAllNested(int numberOfProductsPerCategory)
         {
             ICollection<NestedCategoryWithProductsDetailsModel> result = this.db.Categories
                 .ProjectTo<NestedCategoryWithProductsDetailsModel>()
@@ -192,8 +192,6 @@
 
         private  async Task AddProducts(NestedCategoryWithProductsDetailsModel category, int numberOfProductsPerCategory)
         {
-            numberOfProductsPerCategory = 3;
-
             Dictionary<string, int> productPlaces = this.db.CategoryProducts
                 .Where(cp => cp.CategoryId == category.Id)
                 .Select(c => new { c.ProductId, c.Place})
@@ -204,8 +202,10 @@
                     {
                         return new { product = cp, place = productPlaces[cp.Id] };
                     })
-                .OrderBy(p => p.place).Take(numberOfProductsPerCategory)
-                .Select(p => p.product).ToList();
+                .OrderBy(p => p.place)
+                .Take(numberOfProductsPerCategory)
+                .Select(p => p.product)
+                .ToList();
         }
 
         public async Task Reorder(ICollection<string> categories, ICollection<int> places)
