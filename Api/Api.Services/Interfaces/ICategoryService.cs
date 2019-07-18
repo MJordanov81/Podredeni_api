@@ -19,7 +19,7 @@
 
         Task UpdatePlace(string categoryId, int place);
 
-        Task Reorder(ICollection<string> categories, ICollection<int> places);
+        Task Reorder(ICollection<string> categories);
 
         Task ReorderProducts(string categoryId, ICollection<string> products);
 

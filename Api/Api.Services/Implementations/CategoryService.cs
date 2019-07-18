@@ -208,17 +208,18 @@
                 .ToList();
         }
 
-        public async Task Reorder(ICollection<string> categories, ICollection<int> places)
+        public async Task Reorder(ICollection<string> categories)
         {
-            IDictionary<string, int> categoriesAndPlaces = categories.Zip(places, (k, v) => new { k, v })
-              .ToDictionary(x => x.k, x => x.v);
+            int place = 1;
 
-            foreach (var element in categoriesAndPlaces)
+            foreach (var category in categories)
             {
-                this.db.Categories.FirstOrDefault(c => c.Id == element.Key).Place = element.Value;
+                this.db.Categories.OrderByDescending(c => c.Id).FirstOrDefault(c => c.Id == category).Place = place++;
             }
 
-            await this.db.SaveChangesAsync();
+            Console.WriteLine(categories);
+
+            this.db.SaveChanges();
         }
 
         public async Task ReorderProducts(string categoryId, ICollection<string> products)

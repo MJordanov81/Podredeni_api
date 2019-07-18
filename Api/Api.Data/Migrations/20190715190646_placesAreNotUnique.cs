@@ -12,9 +12,9 @@ namespace Api.Data.Migrations
             //    name: "IX_CategoryProducts_Place",
             //    table: "CategoryProducts");
 
-            //migrationBuilder.DropIndex(
-            //    name: "IX_Categories_Place",
-            //    table: "Categories");
+            migrationBuilder.DropIndex(
+                name: "IX_Categories_Place",
+                table: "Categories");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

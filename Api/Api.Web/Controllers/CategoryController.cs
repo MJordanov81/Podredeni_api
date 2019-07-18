@@ -117,16 +117,16 @@
         [HttpPut]
         [Authorize]
         [Route("reorder/{id}")]
-        public async Task<IActionResult> ReorderProducts(string id, [FromBody]ProductsReorderModel data)
+        public async Task<IActionResult> ReorderProducts(string id, [FromBody]ReorderModel data)
         {
-            if (string.IsNullOrWhiteSpace(id) || data.Products.Count < 1)
+            if (string.IsNullOrWhiteSpace(id) || data.IdList.Count < 1)
             {
                 return BadRequest();
             }
 
             return await this.Execute(true, false, async () =>
             {
-                await this.categories.ReorderProducts(id, data.Products);
+                await this.categories.ReorderProducts(id, data.IdList);
 
                 return this.Ok();
             });
@@ -135,29 +135,25 @@
         [HttpPut]
         [Authorize]
         [Route("reorder")]
-        public async Task<IActionResult> Reorder([FromBody]ICollection<string> categories)
+        public async Task<IActionResult> Reorder([FromBody]ReorderModel data)
         {
+            var e = "";
 
-            if(categories == null)
+            System.Console.WriteLine(e);
+
+            if(data == null)
             {
                 return BadRequest(ModelConstants.InvalidCategoryPlace);
             }
 
-            if (categories.Count < 1)
+            if (data.IdList.Count < 1)
             {
                 return BadRequest(ModelConstants.InvalidCategoryPlace);
-            }
-
-            ICollection<int> places = new List<int>();
-
-            for (int i = 0; i < categories.Count; i++)
-            {
-                places.Add(i + 1);
             }
 
             return await this.Execute(true, false, async () =>
             {
-                await this.categories.Reorder(categories, places);
+                await this.categories.Reorder(data.IdList);
 
                 return this.Ok();
             });
