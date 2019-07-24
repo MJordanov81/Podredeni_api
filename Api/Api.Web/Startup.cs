@@ -26,7 +26,7 @@
         {
             services
                 .AddDbContext<ApiDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("RestDefault")));
+                options.UseSqlServer(Configuration.GetConnectionString("RestDefault"))); 
 
             services.Configure<SmtpConfiguration>(Configuration.GetSection("Smtp"));
 

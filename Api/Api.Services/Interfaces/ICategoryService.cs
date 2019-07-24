@@ -13,7 +13,7 @@
 
         Task<ICollection<CategoryDetailsModel>> GetAll();
 
-        Task<ICollection<NestedCategoryWithProductsDetailsModel>> GetAllNested(int numberOfProductsPerCategory);
+        Task<ICollection<NestedCategoryWithProductsDetailsModel>> GetAllNested(int numberOfProductsPerCategory, bool includeBlockedProducts = false);
 
         Task UpdateName(string categoryId, string name);
 

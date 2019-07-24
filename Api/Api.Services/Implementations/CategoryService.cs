@@ -138,7 +138,7 @@
             await this.db.SaveChangesAsync();
         }
 
-        public async Task<ICollection<NestedCategoryWithProductsDetailsModel>> GetAllNested(int numberOfProductsPerCategory)
+        public async Task<ICollection<NestedCategoryWithProductsDetailsModel>> GetAllNested(int numberOfProductsPerCategory, bool includeBlockedProducts = false)
         {
             ICollection<NestedCategoryWithProductsDetailsModel> result = this.db.Categories
                 .ProjectTo<NestedCategoryWithProductsDetailsModel>()
@@ -146,6 +146,11 @@
                 .ToList();
 
             ICollection<Product> products = this.db.Products.Include(p => p.CategoryProducts).Include(p => p.SubcategoryProducts).ToList();
+
+            if (!includeBlockedProducts)
+            {
+                products = products.Where(p => p.IsBlocked == false).ToList();
+            }
 
             ICollection<Subcategory> subcategories = this.db.Subcategories.ToList();
 
@@ -184,13 +189,13 @@
 
             foreach (var category in result)
             {
-                await this.AddProducts(category, numberOfProductsPerCategory);
+                await this.AddProducts(category, numberOfProductsPerCategory, includeBlockedProducts);
             }
 
             return result;
         }
 
-        private  async Task AddProducts(NestedCategoryWithProductsDetailsModel category, int numberOfProductsPerCategory)
+        private async Task AddProducts(NestedCategoryWithProductsDetailsModel category, int numberOfProductsPerCategory, bool includeBlockedProducts)
         {
             Dictionary<string, int> productPlaces = this.db.CategoryProducts
                 .Where(cp => cp.CategoryId == category.Id)
@@ -206,6 +211,11 @@
                 .Take(numberOfProductsPerCategory)
                 .Select(p => p.product)
                 .ToList();
+
+            if (!includeBlockedProducts)
+            {
+                category.Products = category.Products.Where(p => p.IsBlocked == false).ToList();
+            }
         }
 
         public async Task Reorder(ICollection<string> categories)

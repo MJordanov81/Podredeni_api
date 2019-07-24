@@ -22,7 +22,7 @@
 
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> Get([FromQuery]int numberOfProducts, [FromQuery]bool areNested = false)
+        public async Task<IActionResult> Get([FromQuery]int numberOfProducts, [FromQuery]bool areNested = false, [FromQuery]bool includeBlockedProducts = false)
         {
             return await this.Execute(false, false, async () =>
             {
@@ -35,7 +35,7 @@
                 }
                 else
                 {
-                    ICollection<NestedCategoryWithProductsDetailsModel> categories = await this.categories.GetAllNested(numberOfProducts);
+                    ICollection<NestedCategoryWithProductsDetailsModel> categories = await this.categories.GetAllNested(numberOfProducts, includeBlockedProducts);
 
                     return this.Ok(categories);
                 }
