@@ -64,10 +64,14 @@
 
         public DbSet<Settings> Settings { get; set; }
 
+        public DbSet<MiscData> MiscData { get; set; }
+
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.ApplyConfiguration(new MiscDataConfiguration());
+
             builder.ApplyConfiguration(new UserConfiguration());
 
             builder.ApplyConfiguration(new ProductConfiguration());

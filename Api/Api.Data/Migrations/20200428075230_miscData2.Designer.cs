@@ -12,8 +12,8 @@ using System;
 namespace Api.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20190718144205_categoryUpdateRollback")]
-    partial class categoryUpdateRollback
+    [Migration("20200428075230_miscData2")]
+    partial class miscData2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -232,6 +232,18 @@ namespace Api.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("InvoiceData");
+                });
+
+            modelBuilder.Entity("Api.Domain.Entities.MiscData", b =>
+                {
+                    b.Property<string>("Key")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Value");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("MiscData");
                 });
 
             modelBuilder.Entity("Api.Domain.Entities.News", b =>
